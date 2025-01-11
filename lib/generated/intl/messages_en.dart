@@ -21,6 +21,9 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
+    "navbar_habits" : MessageLookupByLibrary.simpleMessage("Habits"),
+    "navbar_home" : MessageLookupByLibrary.simpleMessage("Home"),
+    "navbar_profile" : MessageLookupByLibrary.simpleMessage("Profile"),
     "title" : MessageLookupByLibrary.simpleMessage("habitly"),
     "welcome" : MessageLookupByLibrary.simpleMessage("Welcome to habitly")
   };

@@ -54,6 +54,36 @@ class S {
       args: [],
     );
   }
+
+  /// `Home`
+  String get navbar_home {
+    return Intl.message(
+      'Home',
+      name: 'navbar_home',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Habits`
+  String get navbar_habits {
+    return Intl.message(
+      'Habits',
+      name: 'navbar_habits',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Profile`
+  String get navbar_profile {
+    return Intl.message(
+      'Profile',
+      name: 'navbar_profile',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
