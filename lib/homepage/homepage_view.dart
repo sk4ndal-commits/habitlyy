@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:habitlyy/habits/views/habits_list_view.dart';
+
+import '../generated/l10n.dart';
 
 class HomePageView extends StatefulWidget {
-  HomePageView({super.key});
+  const HomePageView({super.key});
 
   @override
   State<HomePageView> createState() => _HomePageViewState();
@@ -12,7 +15,7 @@ class _HomePageViewState extends State<HomePageView> {
 
   static final List<Widget> _widgetOptions = <Widget>[
     HomeWidget(),
-    HabitWidget(),
+    HabitsView(),
     ProfileWidget(),
   ];
 
@@ -30,15 +33,15 @@ class _HomePageViewState extends State<HomePageView> {
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard),
-            label: '',
+            label: S.of(context)?.navbar_home ?? '',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.track_changes),
-            label: '',
+            label: S.of(context)?.navbar_habits ?? '',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: '',
+            label: S.of(context)?.navbar_profile ?? '',
           ),
         ],
         currentIndex: _selectedIndex,
@@ -53,13 +56,6 @@ class HomeWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(child: Text('Home'));
-  }
-}
-
-class HabitWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text('Habits'));
   }
 }
 
