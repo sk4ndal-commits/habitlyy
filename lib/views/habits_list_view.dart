@@ -116,12 +116,14 @@ class _HabitsViewState extends State<HabitsView> {
           actions: <Widget>[
             TextButton(
               child: Text('Cancel'),
+              style: TextButton.styleFrom(foregroundColor: Colors.green),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
               child: Text('Add'),
+              style: TextButton.styleFrom(foregroundColor: Colors.green),
               onPressed: () {
                 final newHabit = TimeInvestmentHabitViewModel(
                   id: DateTime.now().millisecondsSinceEpoch,
@@ -195,6 +197,7 @@ class _HabitsViewState extends State<HabitsView> {
           actions: <Widget>[
             TextButton(
               child: Text('Clear'),
+              style: TextButton.styleFrom(foregroundColor: Colors.green),
               onPressed: () {
                 setState(() {
                   _selectedPriority = null;
@@ -249,6 +252,7 @@ class _HabitsViewState extends State<HabitsView> {
             alignment: Alignment.bottomRight,
             child: FloatingActionButton(
               onPressed: _showFilterDialog,
+              backgroundColor: Colors.orange,
               child: Icon(Icons.filter_list),
             ),
           ),
@@ -257,6 +261,7 @@ class _HabitsViewState extends State<HabitsView> {
             child: Align(
               alignment: Alignment.bottomRight,
               child: FloatingActionButton(
+                backgroundColor: Colors.orange,
                 onPressed: _addHabit,
                 child: Icon(Icons.add),
               ),

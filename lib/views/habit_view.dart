@@ -31,7 +31,7 @@ class HabitView extends StatelessWidget {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: Colors.orange,
                 borderRadius: BorderRadius.circular(12.0),
               ),
               child: Text(
@@ -50,14 +50,14 @@ class HabitView extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.star, size: 16.0, color: Colors.grey),
+                Icon(Icons.calendar_month, size: 16.0, color: Colors.grey),
                 SizedBox(width: 4.0),
                 Text('${habit.startDate.toLocal().toString().split(' ')[0]}'),
               ],
             ),
             Row(
               children: [
-                Icon(Icons.close, size: 16.0, color: Colors.grey),
+                Icon(Icons.calendar_month_outlined, size: 16.0, color: Colors.grey),
                 SizedBox(width: 4.0),
                 Text('${habit.deadline.toLocal().toString().split(' ')[0]}'),
               ],
@@ -113,7 +113,7 @@ class HabitView extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Edit: ${habit.title}'),
+          title: Text('${habit.title}'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,12 +154,14 @@ class HabitView extends StatelessWidget {
           actions: <Widget>[
             TextButton(
               child: Text('Cancel'),
+              style: TextButton.styleFrom(foregroundColor: Colors.green),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
               child: Text('Save'),
+              style: TextButton.styleFrom(foregroundColor: Colors.green),
               onPressed: () {
                 // Update the habit details
                 habit.priority = selectedPriority;
@@ -195,12 +197,14 @@ class HabitView extends StatelessWidget {
           actions: <Widget>[
             TextButton(
               child: Text('No'),
+              style: TextButton.styleFrom(foregroundColor: Colors.green),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
               child: Text('Yes'),
+              style: TextButton.styleFrom(foregroundColor: Colors.green),
               onPressed: () {
                 onDelete();
                 Navigator.of(context).pop();
