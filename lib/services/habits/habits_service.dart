@@ -1,7 +1,7 @@
 import 'package:habitlyy/service_locator.dart';
 
-import '../repositories/habits_repository.dart';
-import '../viewmodels/habit_viewmodel.dart';
+import '../../repositories/habits/habits_repository.dart';
+import '../../viewmodels/habits/habit_viewmodel.dart';
 
 abstract class IHabitsService {
   void addHabit(TimeInvestmentHabitViewModel habit);

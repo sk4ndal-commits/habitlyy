@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:habitlyy/service_locator.dart';
-import '../enums/goal_priority.dart';
-import '../services/habits_service.dart';
-import '../viewmodels/habit_viewmodel.dart';
+import '../../enums/habit_priority.dart';
+import '../../services/habits/habits_service.dart';
+import '../../viewmodels/habits/habit_viewmodel.dart';
 import 'habit_view.dart';
 
 /// A stateful widget that displays a list of habits.
@@ -15,7 +15,7 @@ class HabitsView extends StatefulWidget {
 
 class _HabitsViewState extends State<HabitsView> {
   final habitsService = getIt<IHabitsService>();
-  GoalPriority? _selectedPriority;
+  HabitPriority? _selectedPriority;
   bool _filterCompleted = false;
   bool _filterOverdue = false;
 
@@ -24,7 +24,7 @@ class _HabitsViewState extends State<HabitsView> {
     final targetHoursController = TextEditingController();
     final startDateController = TextEditingController();
     final deadlineController = TextEditingController();
-    GoalPriority priority = GoalPriority.LOW;
+    HabitPriority priority = HabitPriority.LOW;
 
     _showAddHabitDialog(
       titleController,
@@ -40,7 +40,7 @@ class _HabitsViewState extends State<HabitsView> {
     TextEditingController targetHoursController,
     TextEditingController startDateController,
     TextEditingController deadlineController,
-    GoalPriority priority,
+    HabitPriority priority,
   ) {
     showDialog(
       context: context,
@@ -97,15 +97,15 @@ class _HabitsViewState extends State<HabitsView> {
                   }
                 },
               ),
-              DropdownButton<GoalPriority>(
+              DropdownButton<HabitPriority>(
                 value: priority,
-                onChanged: (GoalPriority? newValue) {
+                onChanged: (HabitPriority? newValue) {
                   setState(() {
                     priority = newValue!;
                   });
                 },
-                items: GoalPriority.values.map((GoalPriority classType) {
-                  return DropdownMenuItem<GoalPriority>(
+                items: HabitPriority.values.map((HabitPriority classType) {
+                  return DropdownMenuItem<HabitPriority>(
                     value: classType,
                     child: Text(classType.toString().split('.').last),
                   );
@@ -132,6 +132,7 @@ class _HabitsViewState extends State<HabitsView> {
                   startDate: DateTime.parse(startDateController.text),
                   deadline: DateTime.parse(deadlineController.text),
                   targetHours: double.parse(targetHoursController.text),
+                  frequencyDays: null,
                 );
                 setState(() {
                   habitsService.addHabit(newHabit);
@@ -152,6 +153,10 @@ class _HabitsViewState extends State<HabitsView> {
   }
 
   void _showFilterDialog() {
+    HabitPriority? tempSelectedPriority = _selectedPriority;
+    bool tempFilterCompleted = _filterCompleted;
+    bool tempFilterOverdue = _filterOverdue;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -160,15 +165,15 @@ class _HabitsViewState extends State<HabitsView> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              DropdownButton<GoalPriority>(
-                value: _selectedPriority,
-                onChanged: (GoalPriority? newValue) {
+              DropdownButton<HabitPriority>(
+                value: tempSelectedPriority,
+                onChanged: (HabitPriority? newValue) {
                   setState(() {
-                    _selectedPriority = newValue;
+                    tempSelectedPriority = newValue;
                   });
                 },
-                items: GoalPriority.values.map((GoalPriority classType) {
-                  return DropdownMenuItem<GoalPriority>(
+                items: HabitPriority.values.map((HabitPriority classType) {
+                  return DropdownMenuItem<HabitPriority>(
                     value: classType,
                     child: Text(classType.toString().split('.').last),
                   );
@@ -176,19 +181,19 @@ class _HabitsViewState extends State<HabitsView> {
               ),
               CheckboxListTile(
                 title: Text('Completed'),
-                value: _filterCompleted,
+                value: tempFilterCompleted,
                 onChanged: (bool? value) {
                   setState(() {
-                    _filterCompleted = value!;
+                    tempFilterCompleted = value!;
                   });
                 },
               ),
               CheckboxListTile(
                 title: Text('Overdue'),
-                value: _filterOverdue,
+                value: tempFilterOverdue,
                 onChanged: (bool? value) {
                   setState(() {
-                    _filterOverdue = value!;
+                    tempFilterOverdue = value!;
                   });
                 },
               ),
@@ -203,6 +208,18 @@ class _HabitsViewState extends State<HabitsView> {
                   _selectedPriority = null;
                   _filterCompleted = false;
                   _filterOverdue = false;
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Apply'),
+              style: TextButton.styleFrom(foregroundColor: Colors.green),
+              onPressed: () {
+                setState(() {
+                  _selectedPriority = tempSelectedPriority;
+                  _filterCompleted = tempFilterCompleted;
+                  _filterOverdue = tempFilterOverdue;
                 });
                 Navigator.of(context).pop();
               },

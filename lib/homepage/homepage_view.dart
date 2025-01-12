@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../views/habits_list_view.dart';
-
+import '../views/habits/habits_list_view.dart';
 
 class HomePageView extends StatefulWidget {
   const HomePageView({super.key});
@@ -28,6 +27,21 @@ class _HomePageViewState extends State<HomePageView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+          title: Row(
+        children: [
+          Text('habitlyy',
+              style: TextStyle(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black,
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic,
+              )),
+          SizedBox(width: 8.0),
+          Icon(Icons.task, color: Colors.green)
+        ],
+      )),
       body: _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[

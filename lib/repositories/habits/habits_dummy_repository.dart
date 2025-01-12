@@ -1,6 +1,6 @@
 
-import '../enums/goal_priority.dart';
-import '../viewmodels/habit_viewmodel.dart';
+import '../../enums/habit_priority.dart';
+import '../../viewmodels/habits/habit_viewmodel.dart';
 import 'habits_repository.dart';
 
 class HabitsDummyRepository implements IHabitsRepository {
@@ -10,10 +10,11 @@ class HabitsDummyRepository implements IHabitsRepository {
     return TimeInvestmentHabitViewModel(
       id: index,
       title: 'Habit $index',
-      priority: GoalPriority.HIGH,
+      priority: HabitPriority.HIGH,
       startDate: DateTime.now().subtract(Duration(days: index)),
       deadline: DateTime.now().add(Duration(days: index)),
-      targetHours: index * 1.0
+      targetHours: index * 1.0,
+      frequencyDays: null
     );
   });
 

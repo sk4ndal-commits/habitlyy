@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:habitlyy/enums/goal_priority.dart';
-import 'package:habitlyy/repositories/habits_repository.dart';
+import 'package:habitlyy/enums/habit_priority.dart';
+import 'package:habitlyy/repositories/habits/habits_repository.dart';
 import 'package:habitlyy/service_locator.dart';
-import 'package:habitlyy/services/habits_service.dart';
-import 'package:habitlyy/viewmodels/habit_viewmodel.dart';
+import 'package:habitlyy/services/habits/habits_service.dart';
+import 'package:habitlyy/viewmodels/habits/habit_viewmodel.dart';
 import 'package:mockito/mockito.dart';
 
 class MockHabitsRepository extends Mock implements IHabitsRepository {}
@@ -27,10 +27,11 @@ void main() {
       final habit = TimeInvestmentHabitViewModel(
         id: 1,
         title: 'Test Habit',
-        priority: GoalPriority.LOW,
+        priority: HabitPriority.LOW,
         startDate: DateTime.now(),
         deadline: DateTime.now().add(Duration(days: 7)),
         targetHours: 10.0,
+        frequencyDays: null
       );
 
       habitsService.addHabit(habit);
@@ -51,10 +52,11 @@ void main() {
         TimeInvestmentHabitViewModel(
           id: 1,
           title: 'Test Habit',
-          priority: GoalPriority.LOW,
+          priority: HabitPriority.LOW,
           startDate: DateTime.now(),
           deadline: DateTime.now().add(Duration(days: 7)),
           targetHours: 10.0,
+          frequencyDays: null
         )
       ];
 
@@ -81,18 +83,20 @@ void main() {
       final habit1 = TimeInvestmentHabitViewModel(
         id: 1,
         title: 'Habit 1',
-        priority: GoalPriority.LOW,
+        priority: HabitPriority.LOW,
         startDate: DateTime.now(),
         deadline: DateTime.now().add(Duration(days: 7)),
         targetHours: 10.0,
+        frequencyDays: null
       );
       final habit2 = TimeInvestmentHabitViewModel(
         id: 2,
         title: 'Habit 2',
-        priority: GoalPriority.MEDIUM,
+        priority: HabitPriority.MEDIUM,
         startDate: DateTime.now(),
         deadline: DateTime.now().add(Duration(days: 7)),
         targetHours: 20.0,
+        frequencyDays: null
       );
 
       habitsService.addHabit(habit1);

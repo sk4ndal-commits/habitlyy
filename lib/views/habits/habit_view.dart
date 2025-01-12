@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../enums/goal_priority.dart';
-import '../viewmodels/habit_viewmodel.dart';
+import '../../enums/habit_priority.dart';
+import '../../viewmodels/habits/habit_viewmodel.dart';
 
 /// A widget that displays a habit with options to edit or delete it.
 class HabitView extends StatelessWidget {
@@ -107,7 +107,7 @@ class HabitView extends StatelessWidget {
         text: habit.deadline.toLocal().toString().split(' ')[0]);
     TextEditingController targetHoursController =
         TextEditingController(text: habit.targetHours.toString());
-    GoalPriority selectedPriority = habit.priority;
+    HabitPriority selectedPriority = habit.priority;
 
     showDialog(
       context: context,
@@ -120,15 +120,15 @@ class HabitView extends StatelessWidget {
             children: [
               SizedBox(height: 8.0),
               Text("Priority"),
-              DropdownButton<GoalPriority>(
+              DropdownButton<HabitPriority>(
                 value: selectedPriority,
-                onChanged: (GoalPriority? newValue) {
+                onChanged: (HabitPriority? newValue) {
                   if (newValue != null) {
                     selectedPriority = newValue;
                   }
                 },
-                items: GoalPriority.values.map((GoalPriority priority) {
-                  return DropdownMenuItem<GoalPriority>(
+                items: HabitPriority.values.map((HabitPriority priority) {
+                  return DropdownMenuItem<HabitPriority>(
                     value: priority,
                     child: Text(priority.toString().split('.').last),
                   );

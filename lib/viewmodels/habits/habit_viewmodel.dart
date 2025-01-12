@@ -1,10 +1,9 @@
 import 'dart:core';
 
-
-import '../enums/goal_priority.dart';
+import '../../enums/frequency_days.dart';
+import '../../enums/habit_priority.dart';
 import 'habit_viewmodel_base.dart';
 
-// Derived class: TimeInvestmentGoal
 class TimeInvestmentHabitViewModel extends HabitViewModelBase {
   double targetHours;
   double investedHours = 0;
@@ -13,16 +12,18 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
   TimeInvestmentHabitViewModel({
     required int id,
     required String title,
-    required GoalPriority priority,
+    required HabitPriority priority,
     required DateTime startDate,
     required DateTime deadline,
     required this.targetHours,
+    required List<FrequencyDays>? frequencyDays,
   }) : super(
           id: id,
           title: title,
           priority: priority,
           startDate: startDate,
           deadline: deadline,
+          frequencyDays: frequencyDays,
         );
 
   void logTime(DateTime date, double hours) {

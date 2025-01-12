@@ -1,14 +1,17 @@
 // Base class: Goal
-import '../enums/goal_priority.dart';
+import 'package:habitlyy/enums/frequency_days.dart';
+
+import '../../enums/habit_priority.dart';
 
 class HabitViewModelBase {
   int id;
   String title;
-  GoalPriority priority;
+  HabitPriority priority;
   late bool completed;
   DateTime startDate;
   DateTime deadline;
   late DateTime lastUpdated;
+  List<FrequencyDays>? frequencyDays;
 
   HabitViewModelBase({
     required this.id,
@@ -16,6 +19,7 @@ class HabitViewModelBase {
     required this.priority,
     required this.startDate,
     required this.deadline,
+    required this.frequencyDays,
   }) {
     completed = false;
     lastUpdated = DateTime.now();

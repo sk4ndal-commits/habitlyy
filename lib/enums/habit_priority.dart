@@ -1,5 +1,5 @@
 // Enum for goal priority
-enum GoalPriority {
+enum HabitPriority {
   LOW,
   MEDIUM,
   HIGH,

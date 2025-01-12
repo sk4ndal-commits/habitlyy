@@ -1,4 +1,4 @@
-import '../viewmodels/habit_viewmodel.dart';
+import '../../viewmodels/habits/habit_viewmodel.dart';
 
 abstract class IHabitsRepository {
   void addHabit(TimeInvestmentHabitViewModel habit);
