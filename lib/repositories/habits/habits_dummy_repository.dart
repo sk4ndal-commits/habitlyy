@@ -7,14 +7,14 @@ import 'habits_repository.dart';
 class HabitsDummyRepository implements IHabitsRepository {
   final List<TimeInvestmentHabitViewModel> _habits = [];
 
-  final List<FrequencyDays> _frequencyDays = [
-    FrequencyDays.MONDAY,
-    FrequencyDays.TUESDAY,
-    FrequencyDays.WEDNESDAY,
-    FrequencyDays.THURSDAY,
-    FrequencyDays.FRIDAY,
-    FrequencyDays.SATURDAY,
-    FrequencyDays.SUNDAY
+  final List<FrequencyDay> _frequencyDays = [
+    FrequencyDay.MONDAY,
+    FrequencyDay.TUESDAY,
+    FrequencyDay.WEDNESDAY,
+    FrequencyDay.THURSDAY,
+    FrequencyDay.FRIDAY,
+    FrequencyDay.SATURDAY,
+    FrequencyDay.SUNDAY
   ];
 
   HabitsDummyRepository() {

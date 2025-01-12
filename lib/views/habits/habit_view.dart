@@ -100,25 +100,25 @@ class HabitView extends StatelessWidget {
     );
   }
 
-  String _abbreviateFrequencyDays(List<FrequencyDays>? frequencyDays) {
+  String _abbreviateFrequencyDays(List<FrequencyDay>? frequencyDays) {
     if (frequencyDays == null || frequencyDays.isEmpty) {
       return '';
     }
     return frequencyDays.map((day) {
       switch (day) {
-        case FrequencyDays.MONDAY:
+        case FrequencyDay.MONDAY:
           return 'Mo';
-        case FrequencyDays.TUESDAY:
+        case FrequencyDay.TUESDAY:
           return 'Tu';
-        case FrequencyDays.WEDNESDAY:
+        case FrequencyDay.WEDNESDAY:
           return 'We';
-        case FrequencyDays.THURSDAY:
+        case FrequencyDay.THURSDAY:
           return 'Th';
-        case FrequencyDays.FRIDAY:
+        case FrequencyDay.FRIDAY:
           return 'Fr';
-        case FrequencyDays.SATURDAY:
+        case FrequencyDay.SATURDAY:
           return 'Sa';
-        case FrequencyDays.SUNDAY:
+        case FrequencyDay.SUNDAY:
           return 'Su';
       }
     }).join(', ');

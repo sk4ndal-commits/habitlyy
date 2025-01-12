@@ -1,4 +1,4 @@
-enum FrequencyDays {
+enum FrequencyDay {
   MONDAY,
   TUESDAY,
   WEDNESDAY,

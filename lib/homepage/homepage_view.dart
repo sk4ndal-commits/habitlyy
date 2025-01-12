@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../views/dashboard/dashboard_view.dart';
 import '../views/habits/habits_list_view.dart';
 
 class HomePageView extends StatefulWidget {
@@ -63,13 +64,6 @@ class _HomePageViewState extends State<HomePageView> {
         onTap: _onTabSelected,
       ),
     );
-  }
-}
-
-class DashboardView extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text('Dashboard'));
   }
 }
 

@@ -11,7 +11,7 @@ class HabitViewModelBase {
   DateTime startDate;
   DateTime deadline;
   late DateTime lastUpdated;
-  List<FrequencyDays>? frequencyDays;
+  List<FrequencyDay>? frequencyDays;
 
   HabitViewModelBase({
     required this.id,

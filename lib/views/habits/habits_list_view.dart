@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:habitlyy/service_locator.dart';
 import '../../enums/frequency_days.dart';
 import '../../enums/habit_priority.dart';
-import '../../services/habits/habits_service.dart';
+import '../../services/habits/ihabits_service.dart';
 import '../../viewmodels/habits/habit_viewmodel.dart';
 import 'habit_view.dart';
 
@@ -19,6 +19,7 @@ class _HabitsViewState extends State<HabitsView> {
   HabitPriority? _selectedPriority;
   bool _filterCompleted = false;
   bool _filterOverdue = false;
+  final _formKey = GlobalKey<FormState>();
 
   void _addHabit() {
     final titleController = TextEditingController();
@@ -43,112 +44,126 @@ class _HabitsViewState extends State<HabitsView> {
     TextEditingController deadlineController,
     HabitPriority priority,
   ) {
-    List<FrequencyDays> selectedFrequencyDays = [];
+    List<FrequencyDay> selectedFrequencyDays = [];
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Add Habit'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              TextField(
-                controller: titleController,
-                decoration: InputDecoration(labelText: 'Title'),
-              ),
-              TextField(
-                controller: targetHoursController,
-                decoration: InputDecoration(labelText: 'Target Hours'),
-                keyboardType: TextInputType.number,
-              ),
-              TextField(
-                controller: startDateController,
-                decoration: InputDecoration(labelText: 'Start Date'),
-                readOnly: true,
-                onTap: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101),
-                  );
-                  if (pickedDate != null) {
-                    setState(() {
-                      startDateController.text =
-                          pickedDate.toLocal().toString().split(' ')[0];
-                    });
-                  }
-                },
-              ),
-              TextField(
-                controller: deadlineController,
-                decoration: InputDecoration(labelText: 'Deadline'),
-                readOnly: true,
-                onTap: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101),
-                  );
-                  if (pickedDate != null) {
-                    setState(() {
-                      deadlineController.text =
-                          pickedDate.toLocal().toString().split(' ')[0];
-                    });
-                  }
-                },
-              ),
-              Row(
-                children: [
-                  Text('Priority'),
-                  SizedBox(width: 8.0),
-                  DropdownButton<HabitPriority>(
-                    value: priority,
-                    onChanged: (HabitPriority? newValue) {
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextField(
+                  controller: titleController,
+                  decoration: InputDecoration(labelText: 'Title'),
+                ),
+                TextFormField(
+                  controller: targetHoursController,
+                  decoration: InputDecoration(labelText: 'Target Hours'),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a value';
+                    }
+                    final number = double.tryParse(value);
+                    if (number == null || number <= 0) {
+                      return 'Please enter a number greater than 0';
+                    }
+                    return null;
+                  },
+                ),
+                TextField(
+                  controller: startDateController,
+                  decoration: InputDecoration(labelText: 'Start Date'),
+                  readOnly: true,
+                  onTap: () async {
+                    DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2101),
+                    );
+                    if (pickedDate != null) {
                       setState(() {
-                        priority = newValue!;
+                        startDateController.text =
+                            pickedDate.toLocal().toString().split(' ')[0];
                       });
-                    },
-                    items: HabitPriority.values.map((HabitPriority classType) {
-                      return DropdownMenuItem<HabitPriority>(
-                        value: classType,
-                        child: Text(classType.toString().split('.').last),
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-              SizedBox(height: 8.0),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('Frequency Days'),
-                  ),
-                  SizedBox(width: 8.0),
-                  Wrap(
-                    spacing: 8.0,
-                    children: FrequencyDays.values.map((day) {
-                      return ChoiceChip(
-                        label: Text(
-                            day.toString().split('.').last.substring(0, 2)),
-                        selected: selectedFrequencyDays.contains(day),
-                        onSelected: (bool selected) {
-                          setState(() {
-                            selected
-                                ? selectedFrequencyDays.add(day)
-                                : selectedFrequencyDays.remove(day);
-                          });
-                        },
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-            ],
+                    }
+                  },
+                ),
+                TextField(
+                  controller: deadlineController,
+                  decoration: InputDecoration(labelText: 'Deadline'),
+                  readOnly: true,
+                  onTap: () async {
+                    DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2101),
+                    );
+                    if (pickedDate != null) {
+                      setState(() {
+                        deadlineController.text =
+                            pickedDate.toLocal().toString().split(' ')[0];
+                      });
+                    }
+                  },
+                ),
+                Row(
+                  children: [
+                    Text('Priority'),
+                    SizedBox(width: 8.0),
+                    DropdownButton<HabitPriority>(
+                      value: priority,
+                      onChanged: (HabitPriority? newValue) {
+                        setState(() {
+                          priority = newValue!;
+                        });
+                      },
+                      items:
+                          HabitPriority.values.map((HabitPriority classType) {
+                        return DropdownMenuItem<HabitPriority>(
+                          value: classType,
+                          child: Text(classType.toString().split('.').last),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8.0),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text('Frequency Days'),
+                    ),
+                    SizedBox(width: 8.0),
+                    Wrap(
+                      spacing: 8.0,
+                      children: FrequencyDay.values.map((day) {
+                        return ChoiceChip(
+                          label: Text(
+                              day.toString().split('.').last.substring(0, 2)),
+                          selected: selectedFrequencyDays.contains(day),
+                          onSelected: (bool selected) {
+                            setState(() {
+                              selected
+                                  ? selectedFrequencyDays.add(day)
+                                  : selectedFrequencyDays.remove(day);
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
           actions: <Widget>[
             TextButton(
@@ -162,25 +177,27 @@ class _HabitsViewState extends State<HabitsView> {
               child: Text('Add'),
               style: TextButton.styleFrom(foregroundColor: Colors.green),
               onPressed: () {
-                final newHabit = TimeInvestmentHabitViewModel(
-                  id: DateTime.now().millisecondsSinceEpoch,
-                  title: titleController.text,
-                  priority: priority,
-                  startDate: DateTime.parse(startDateController.text),
-                  deadline: DateTime.parse(deadlineController.text),
-                  targetHours: double.parse(targetHoursController.text),
-                  frequencyDays: selectedFrequencyDays,
-                );
-                setState(() {
-                  habitsService.addHabit(newHabit);
-                });
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('${newHabit.title} added'),
-                    duration: Duration(seconds: 1),
-                  ),
-                );
+                if (_formKey.currentState!.validate()) {
+                  final newHabit = TimeInvestmentHabitViewModel(
+                    id: DateTime.now().millisecondsSinceEpoch,
+                    title: titleController.text,
+                    priority: priority,
+                    startDate: DateTime.parse(startDateController.text),
+                    deadline: DateTime.parse(deadlineController.text),
+                    targetHours: double.parse(targetHoursController.text),
+                    frequencyDays: selectedFrequencyDays,
+                  );
+                  setState(() {
+                    habitsService.addHabit(newHabit);
+                  });
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${newHabit.title} added'),
+                      duration: Duration(seconds: 1),
+                    ),
+                  );
+                }
               },
             ),
           ],

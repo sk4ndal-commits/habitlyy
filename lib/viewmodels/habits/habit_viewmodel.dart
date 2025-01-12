@@ -16,7 +16,7 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
     required DateTime startDate,
     required DateTime deadline,
     required this.targetHours,
-    required List<FrequencyDays>? frequencyDays,
+    required List<FrequencyDay>? frequencyDays,
   }) : super(
           id: id,
           title: title,
