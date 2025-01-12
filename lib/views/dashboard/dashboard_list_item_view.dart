@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:habitlyy/viewmodels/habits/habit_viewmodel.dart';
+
+import '../../providers/habit_provider.dart';
 
 class DashboardListItemView extends StatefulWidget {
   final TimeInvestmentHabitViewModel habit;
@@ -123,9 +126,9 @@ class _DashboardListItemViewState extends State<DashboardListItemView> {
                   final newInvestedHours =
                       double.tryParse(investedHoursController.text);
                   if (newInvestedHours != null) {
-                    setState(() {
-                      habit.investedHours += newInvestedHours;
-                    });
+                    Provider.of<HabitsProvider>(context, listen: false)
+                        .updateInvestedHours(widget.habit, newInvestedHours);
+                    setState(() {});
                     Navigator.of(context).pop();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(

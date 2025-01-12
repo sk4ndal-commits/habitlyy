@@ -8,13 +8,16 @@ class DashboardListView extends StatelessWidget {
   Widget build(BuildContext context) {
     final habitsService = getIt<IHabitsService>();
     final todayHabits = habitsService.getTodayHabits();
-    todayHabits.sort((a, b) => a.priority.index.compareTo(b.priority.index));
+    final filteredHabits = todayHabits
+        .where((habit) => habit.investedHours < habit.targetHours)
+        .toList();
+    filteredHabits.sort((a, b) => a.priority.index.compareTo(b.priority.index));
 
     return Expanded(
       child: ListView.builder(
-        itemCount: todayHabits.length,
+        itemCount: filteredHabits.length,
         itemBuilder: (context, index) {
-          final habit = todayHabits[index];
+          final habit = filteredHabits[index];
           return DashboardListItemView(habit: habit);
         },
       ),

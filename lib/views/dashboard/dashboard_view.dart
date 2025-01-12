@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:habitlyy/services/habits/ihabits_service.dart';
+import 'package:habitlyy/views/dashboard/dashboard_graph_view.dart';
 import 'dashboard_list_view.dart';
 
 class DashboardView extends StatelessWidget {
@@ -8,14 +8,39 @@ class DashboardView extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
+          SizedBox(height: 32.0),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                "Today's Progress",
+                style: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
           // First row: Graph
-          Container(
-            height: 200,
-            color: Colors.orange, // Placeholder for the graph
-            child: Center(child: Text('Graph Placeholder')),
+          Card(
+            margin: EdgeInsets.all(16.0),
+            child: Padding(
+              padding: EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 8.0),
+                  Container(
+                    height: 200,
+                    child: DashboardGraphView(),
+                  ),
+                ],
+              ),
+            ),
           ),
           // Heading: Today's Tasks
-          SizedBox(height: 64.0),
+          SizedBox(height: 32.0),
           Align(
             alignment: Alignment.centerLeft,
             child: Padding(
