@@ -15,17 +15,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        colorScheme: ColorScheme.fromSwatch(
-          primarySwatch: Colors.blue,
-          accentColor: Colors.orange,
-          cardColor: Colors.white,
-          backgroundColor: Colors.white,
-          errorColor: Colors.red,
-          brightness: Brightness.light,
-        ),
-      ),
+      themeMode: ThemeMode.system,
+      darkTheme: ThemeData.dark(),
+      theme: ThemeData.light(),
       home: HomePageView(),
       localizationsDelegates: [
         S.delegate,
