@@ -13,7 +13,7 @@ class _HomePageViewState extends State<HomePageView> {
   int _selectedIndex = 0;
 
   static final List<Widget> _widgetOptions = <Widget>[
-    HomeWidget(),
+    DashboardView(),
     HabitsView(),
     ProfileWidget(),
   ];
@@ -51,17 +51,10 @@ class _HomePageViewState extends State<HomePageView> {
   }
 }
 
-class HomeWidget extends StatelessWidget {
+class DashboardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text('Home'));
-  }
-}
-
-class NotificationsWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text('Notifications'));
+    return Center(child: Text('Dashboard'));
   }
 }
 
