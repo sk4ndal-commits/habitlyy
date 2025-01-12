@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habitlyy/service_locator.dart';
+import '../../enums/frequency_days.dart';
 import '../../enums/habit_priority.dart';
 import '../../services/habits/habits_service.dart';
 import '../../viewmodels/habits/habit_viewmodel.dart';
@@ -42,6 +43,8 @@ class _HabitsViewState extends State<HabitsView> {
     TextEditingController deadlineController,
     HabitPriority priority,
   ) {
+    List<FrequencyDays> selectedFrequencyDays = [];
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -97,19 +100,53 @@ class _HabitsViewState extends State<HabitsView> {
                   }
                 },
               ),
-              DropdownButton<HabitPriority>(
-                value: priority,
-                onChanged: (HabitPriority? newValue) {
-                  setState(() {
-                    priority = newValue!;
-                  });
-                },
-                items: HabitPriority.values.map((HabitPriority classType) {
-                  return DropdownMenuItem<HabitPriority>(
-                    value: classType,
-                    child: Text(classType.toString().split('.').last),
-                  );
-                }).toList(),
+              Row(
+                children: [
+                  Text('Priority'),
+                  SizedBox(width: 8.0),
+                  DropdownButton<HabitPriority>(
+                    value: priority,
+                    onChanged: (HabitPriority? newValue) {
+                      setState(() {
+                        priority = newValue!;
+                      });
+                    },
+                    items: HabitPriority.values.map((HabitPriority classType) {
+                      return DropdownMenuItem<HabitPriority>(
+                        value: classType,
+                        child: Text(classType.toString().split('.').last),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8.0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Frequency Days'),
+                  ),
+                  SizedBox(width: 8.0),
+                  Wrap(
+                    spacing: 8.0,
+                    children: FrequencyDays.values.map((day) {
+                      return ChoiceChip(
+                        label: Text(
+                            day.toString().split('.').last.substring(0, 2)),
+                        selected: selectedFrequencyDays.contains(day),
+                        onSelected: (bool selected) {
+                          setState(() {
+                            selected
+                                ? selectedFrequencyDays.add(day)
+                                : selectedFrequencyDays.remove(day);
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ],
               ),
             ],
           ),
@@ -132,7 +169,7 @@ class _HabitsViewState extends State<HabitsView> {
                   startDate: DateTime.parse(startDateController.text),
                   deadline: DateTime.parse(deadlineController.text),
                   targetHours: double.parse(targetHoursController.text),
-                  frequencyDays: null,
+                  frequencyDays: selectedFrequencyDays,
                 );
                 setState(() {
                   habitsService.addHabit(newHabit);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../enums/frequency_days.dart';
 import '../../enums/habit_priority.dart';
 import '../../viewmodels/habits/habit_viewmodel.dart';
 
@@ -43,6 +44,22 @@ class HabitView extends StatelessWidget {
                 ),
               ),
             ),
+            SizedBox(width: 8.0),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              decoration: BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              child: Text(
+                _abbreviateFrequencyDays(habit.frequencyDays),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 10.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ],
         ),
         subtitle: Column(
@@ -57,7 +74,8 @@ class HabitView extends StatelessWidget {
             ),
             Row(
               children: [
-                Icon(Icons.calendar_month_outlined, size: 16.0, color: Colors.grey),
+                Icon(Icons.calendar_month_outlined,
+                    size: 16.0, color: Colors.grey),
                 SizedBox(width: 4.0),
                 Text('${habit.deadline.toLocal().toString().split(' ')[0]}'),
               ],
@@ -80,6 +98,30 @@ class HabitView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _abbreviateFrequencyDays(List<FrequencyDays>? frequencyDays) {
+    if (frequencyDays == null || frequencyDays.isEmpty) {
+      return '';
+    }
+    return frequencyDays.map((day) {
+      switch (day) {
+        case FrequencyDays.MONDAY:
+          return 'Mo';
+        case FrequencyDays.TUESDAY:
+          return 'Tu';
+        case FrequencyDays.WEDNESDAY:
+          return 'We';
+        case FrequencyDays.THURSDAY:
+          return 'Th';
+        case FrequencyDays.FRIDAY:
+          return 'Fr';
+        case FrequencyDays.SATURDAY:
+          return 'Sa';
+        case FrequencyDays.SUNDAY:
+          return 'Su';
+      }
+    }).join(', ');
   }
 
   Widget _buildEditButton(BuildContext context) {
