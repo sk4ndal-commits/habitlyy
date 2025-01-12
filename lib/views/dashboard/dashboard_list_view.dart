@@ -3,7 +3,12 @@ import 'package:habitlyy/service_locator.dart';
 import 'package:habitlyy/views/dashboard/dashboard_list_item_view.dart';
 import '../../services/habits/ihabits_service.dart';
 
-class DashboardListView extends StatelessWidget {
+class DashboardListView extends StatefulWidget {
+  @override
+  _DashboardListViewState createState() => _DashboardListViewState();
+}
+
+class _DashboardListViewState extends State<DashboardListView> {
   @override
   Widget build(BuildContext context) {
     final habitsService = getIt<IHabitsService>();
@@ -18,7 +23,12 @@ class DashboardListView extends StatelessWidget {
         itemCount: filteredHabits.length,
         itemBuilder: (context, index) {
           final habit = filteredHabits[index];
-          return DashboardListItemView(habit: habit);
+          return DashboardListItemView(
+            habit: habit,
+            onHabitUpdated: () {
+              setState(() {});
+            },
+          );
         },
       ),
     );

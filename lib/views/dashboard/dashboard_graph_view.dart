@@ -49,7 +49,7 @@ class _DashboardGraphViewState extends State<DashboardGraphView> {
           yValueMapper: (PieChartData data, _) => data.value,
           pointColorMapper: (PieChartData data, _) => data.color,
           dataLabelMapper: (PieChartData data, _) =>
-              '${data.label}: ${data.value.toStringAsFixed(1)}h',
+              '${data.label} \n ${data.value.toStringAsFixed(1)}h',
           dataLabelSettings: DataLabelSettings(
             isVisible: true,
             textStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),

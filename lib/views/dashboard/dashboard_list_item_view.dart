@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:habitlyy/viewmodels/habits/habit_viewmodel.dart';
-
 import '../../providers/habit_provider.dart';
 
 class DashboardListItemView extends StatefulWidget {
   final TimeInvestmentHabitViewModel habit;
+  final VoidCallback onHabitUpdated;
 
-  DashboardListItemView({required this.habit});
+  DashboardListItemView({required this.habit, required this.onHabitUpdated});
 
   @override
   _DashboardListItemViewState createState() => _DashboardListItemViewState();
@@ -129,6 +129,7 @@ class _DashboardListItemViewState extends State<DashboardListItemView> {
                     Provider.of<HabitsProvider>(context, listen: false)
                         .updateInvestedHours(widget.habit, newInvestedHours);
                     setState(() {});
+                    widget.onHabitUpdated();
                     Navigator.of(context).pop();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
