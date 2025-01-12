@@ -107,19 +107,19 @@ class HabitView extends StatelessWidget {
     return frequencyDays.map((day) {
       switch (day) {
         case FrequencyDay.MONDAY:
-          return 'Mo';
+          return 'MO';
         case FrequencyDay.TUESDAY:
-          return 'Tu';
+          return 'TU';
         case FrequencyDay.WEDNESDAY:
-          return 'We';
+          return 'WE';
         case FrequencyDay.THURSDAY:
-          return 'Th';
+          return 'TH';
         case FrequencyDay.FRIDAY:
-          return 'Fr';
+          return 'FR';
         case FrequencyDay.SATURDAY:
-          return 'Sa';
+          return 'SA';
         case FrequencyDay.SUNDAY:
-          return 'Su';
+          return 'SU';
       }
     }).join(', ');
   }
