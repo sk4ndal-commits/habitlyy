@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:habitlyy/habits/enums/goal_priority.dart';
 import 'package:habitlyy/habits/viewmodels/habit_viewmodel.dart';
 
 /// A widget that displays a habit with options to edit or delete it.
 class HabitView extends StatelessWidget {
-  final HabitViewModel habit;
+  final TimeInvestmentHabitViewModel habit;
   final VoidCallback onDelete;
 
   const HabitView({
@@ -18,11 +19,57 @@ class HabitView extends StatelessWidget {
       margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: ListTile(
         contentPadding: EdgeInsets.all(16.0),
-        title: Text(
-          habit.title,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                habit.title,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              child: Text(
+                habit.priority.toString().split('.').last,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 10.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
         ),
-        subtitle: Text(habit.description),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.star, size: 16.0, color: Colors.grey),
+                SizedBox(width: 4.0),
+                Text('${habit.startDate.toLocal().toString().split(' ')[0]}'),
+              ],
+            ),
+            Row(
+              children: [
+                Icon(Icons.close, size: 16.0, color: Colors.grey),
+                SizedBox(width: 4.0),
+                Text('${habit.deadline.toLocal().toString().split(' ')[0]}'),
+              ],
+            ),
+            Row(
+              children: [
+                Icon(Icons.access_time, size: 16.0, color: Colors.grey),
+                SizedBox(width: 4.0),
+                Text('${habit.targetHours}h'),
+              ],
+            ),
+          ],
+        ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -53,27 +100,82 @@ class HabitView extends StatelessWidget {
   }
 
   void _showEditDialog(BuildContext context) {
+    TextEditingController startDateController = TextEditingController(
+        text: habit.startDate.toLocal().toString().split(' ')[0]);
+    TextEditingController deadlineController = TextEditingController(
+        text: habit.deadline.toLocal().toString().split(' ')[0]);
+    TextEditingController targetHoursController =
+        TextEditingController(text: habit.targetHours.toString());
+    GoalPriority selectedPriority = habit.priority;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Habit Details'),
+          title: Text('Edit: ${habit.title}'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Title: ${habit.title}'),
               SizedBox(height: 8.0),
-              Text('Description: ${habit.description}'),
+              Text("Priority"),
+              DropdownButton<GoalPriority>(
+                value: selectedPriority,
+                onChanged: (GoalPriority? newValue) {
+                  if (newValue != null) {
+                    selectedPriority = newValue;
+                  }
+                },
+                items: GoalPriority.values.map((GoalPriority priority) {
+                  return DropdownMenuItem<GoalPriority>(
+                    value: priority,
+                    child: Text(priority.toString().split('.').last),
+                  );
+                }).toList(),
+              ),
               SizedBox(height: 8.0),
-              Text('Start Date: ${habit.startDate}'),
+              TextField(
+                controller: startDateController,
+                decoration: InputDecoration(labelText: 'Start Date'),
+              ),
+              SizedBox(height: 8.0),
+              TextField(
+                controller: deadlineController,
+                decoration: InputDecoration(labelText: 'Deadline'),
+              ),
+              SizedBox(height: 8.0),
+              TextField(
+                controller: targetHoursController,
+                decoration: InputDecoration(labelText: 'Target Hours'),
+              ),
             ],
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Close'),
+              child: Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Save'),
+              onPressed: () {
+                // Update the habit details
+                habit.priority = selectedPriority;
+                habit.startDate = DateTime.parse(startDateController.text);
+                habit.deadline = DateTime.parse(deadlineController.text);
+                habit.targetHours = double.parse(targetHoursController.text);
+
+                // Close the dialog
+                Navigator.of(context).pop();
+
+                // Show SnackBar
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Changes saved'),
+                    duration: Duration(seconds: 1),
+                  ),
+                );
               },
             ),
           ],
@@ -87,7 +189,7 @@ class HabitView extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirm Deletion'),
+          title: Text(habit.title),
           content: Text('Do you really want to delete this habit?'),
           actions: <Widget>[
             TextButton(

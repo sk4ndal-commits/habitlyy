@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habitlyy/habits/views/habits_list_view.dart';
 
-import '../generated/l10n.dart';
 
 class HomePageView extends StatefulWidget {
   const HomePageView({super.key});
@@ -33,15 +32,15 @@ class _HomePageViewState extends State<HomePageView> {
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard),
-            label: S.of(context)?.navbar_home ?? '',
+            label: '',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.track_changes),
-            label: S.of(context)?.navbar_habits ?? '',
+            label: '',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: S.of(context)?.navbar_profile ?? '',
+            label: '',
           ),
         ],
         currentIndex: _selectedIndex,

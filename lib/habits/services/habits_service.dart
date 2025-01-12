@@ -4,9 +4,9 @@ import '../repositories/habits_repository.dart';
 import '../viewmodels/habit_viewmodel.dart';
 
 abstract class IHabitsService {
-  void addHabit(HabitViewModel habit);
+  void addHabit(TimeInvestmentHabitViewModel habit);
   void removeHabit(int habitId);
-  List<HabitViewModel> getHabits();
+  List<TimeInvestmentHabitViewModel> getHabits();
 }
 
 
@@ -16,7 +16,7 @@ class HabitsService implements IHabitsService {
   HabitsService();
 
   @override
-  void addHabit(HabitViewModel habit) {
+  void addHabit(TimeInvestmentHabitViewModel habit) {
     _repository.addHabit(habit);
   }
 
@@ -26,7 +26,7 @@ class HabitsService implements IHabitsService {
   }
 
   @override
-  List<HabitViewModel> getHabits() {
+  List<TimeInvestmentHabitViewModel> getHabits() {
     return _repository.getHabits();
   }
 }

@@ -1,21 +1,24 @@
 import 'package:habitlyy/habits/viewmodels/habit_viewmodel.dart';
 
+import '../enums/goal_priority.dart';
 import 'habits_repository.dart';
 
 class HabitsDummyRepository implements IHabitsRepository {
-  final List<HabitViewModel> _habits;
+  final List<TimeInvestmentHabitViewModel> _habits;
 
   HabitsDummyRepository() : _habits = List.generate(20, (index) {
-    return HabitViewModel(
+    return TimeInvestmentHabitViewModel(
       id: index,
       title: 'Habit $index',
-      description: 'Description for habit $index',
+      priority: GoalPriority.HIGH,
       startDate: DateTime.now().subtract(Duration(days: index)),
+      deadline: DateTime.now().add(Duration(days: index)),
+      targetHours: index * 1.0
     );
   });
 
   @override
-  void addHabit(HabitViewModel habit) {
+  void addHabit(TimeInvestmentHabitViewModel habit) {
     _habits.add(habit);
   }
 
@@ -25,7 +28,7 @@ class HabitsDummyRepository implements IHabitsRepository {
   }
 
   @override
-  List<HabitViewModel> getHabits() {
+  List<TimeInvestmentHabitViewModel> getHabits() {
     return _habits;
   }
 }
