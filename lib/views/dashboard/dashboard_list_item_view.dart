@@ -17,7 +17,6 @@ class _DashboardListItemViewState extends State<DashboardListItemView> {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-      color: Colors.black12,
       child: Padding(
         padding: EdgeInsets.all(12.0),
         child: Column(
