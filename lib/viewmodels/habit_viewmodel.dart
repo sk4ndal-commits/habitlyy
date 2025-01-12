@@ -1,8 +1,8 @@
 import 'dart:core';
 
-import 'package:habitlyy/habits/viewmodels/habit_viewmodel_base.dart';
 
 import '../enums/goal_priority.dart';
+import 'habit_viewmodel_base.dart';
 
 // Derived class: TimeInvestmentGoal
 class TimeInvestmentHabitViewModel extends HabitViewModelBase {

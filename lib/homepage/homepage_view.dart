@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:habitlyy/habits/views/habits_list_view.dart';
+
+import '../views/habits_list_view.dart';
 
 
 class HomePageView extends StatefulWidget {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:habitlyy/habits/enums/goal_priority.dart';
-import 'package:habitlyy/habits/viewmodels/habit_viewmodel.dart';
+
+import '../enums/goal_priority.dart';
+import '../viewmodels/habit_viewmodel.dart';
 
 /// A widget that displays a habit with options to edit or delete it.
 class HabitView extends StatelessWidget {

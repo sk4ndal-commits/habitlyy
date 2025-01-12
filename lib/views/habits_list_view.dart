@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:habitlyy/habits/services/habits_service.dart';
 import 'package:habitlyy/service_locator.dart';
+import '../enums/goal_priority.dart';
+import '../services/habits_service.dart';
 import '../viewmodels/habit_viewmodel.dart';
 import 'habit_view.dart';
-import 'package:habitlyy/habits/enums/goal_priority.dart';
 
 /// A stateful widget that displays a list of habits.
 class HabitsView extends StatefulWidget {

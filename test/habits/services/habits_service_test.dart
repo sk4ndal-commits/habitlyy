@@ -1,8 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:habitlyy/habits/repositories/habits_repository.dart';
-import 'package:habitlyy/habits/services/habits_service.dart';
-import 'package:habitlyy/habits/viewmodels/habit_viewmodel.dart';
+import 'package:habitlyy/enums/goal_priority.dart';
+import 'package:habitlyy/repositories/habits_repository.dart';
 import 'package:habitlyy/service_locator.dart';
+import 'package:habitlyy/services/habits_service.dart';
+import 'package:habitlyy/viewmodels/habit_viewmodel.dart';
 import 'package:mockito/mockito.dart';
 
 class MockHabitsRepository extends Mock implements IHabitsRepository {}
@@ -23,11 +24,13 @@ void main() {
 
   group('HabitsService', () {
     test('adds a habit', () {
-      final habit = HabitViewModel(
+      final habit = TimeInvestmentHabitViewModel(
         id: 1,
         title: 'Test Habit',
-        description: 'Test Description',
+        priority: GoalPriority.LOW,
         startDate: DateTime.now(),
+        deadline: DateTime.now().add(Duration(days: 7)),
+        targetHours: 10.0,
       );
 
       habitsService.addHabit(habit);
@@ -45,11 +48,13 @@ void main() {
 
     test('gets all habits', () {
       final habits = [
-        HabitViewModel(
+        TimeInvestmentHabitViewModel(
           id: 1,
           title: 'Test Habit',
-          description: 'Test Description',
+          priority: GoalPriority.LOW,
           startDate: DateTime.now(),
+          deadline: DateTime.now().add(Duration(days: 7)),
+          targetHours: 10.0,
         )
       ];
 
@@ -73,17 +78,21 @@ void main() {
     });
 
     test('adds multiple habits', () {
-      final habit1 = HabitViewModel(
+      final habit1 = TimeInvestmentHabitViewModel(
         id: 1,
         title: 'Habit 1',
-        description: 'Description 1',
+        priority: GoalPriority.LOW,
         startDate: DateTime.now(),
+        deadline: DateTime.now().add(Duration(days: 7)),
+        targetHours: 10.0,
       );
-      final habit2 = HabitViewModel(
+      final habit2 = TimeInvestmentHabitViewModel(
         id: 2,
         title: 'Habit 2',
-        description: 'Description 2',
+        priority: GoalPriority.MEDIUM,
         startDate: DateTime.now(),
+        deadline: DateTime.now().add(Duration(days: 7)),
+        targetHours: 20.0,
       );
 
       habitsService.addHabit(habit1);

@@ -1,6 +1,6 @@
-import 'package:habitlyy/habits/viewmodels/habit_viewmodel.dart';
 
 import '../enums/goal_priority.dart';
+import '../viewmodels/habit_viewmodel.dart';
 import 'habits_repository.dart';
 
 class HabitsDummyRepository implements IHabitsRepository {
