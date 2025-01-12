@@ -5,7 +5,6 @@ import 'package:habitlyy/habits/viewmodels/habit_viewmodel.dart';
 import 'package:habitlyy/service_locator.dart';
 import 'package:mockito/mockito.dart';
 
-// Mock class for IHabitsRepository
 class MockHabitsRepository extends Mock implements IHabitsRepository {}
 
 void main() {
@@ -13,15 +12,12 @@ void main() {
   late MockHabitsRepository mockRepository;
 
   setUp(() {
-    // Set up GetIt for dependency injection
     setupLocator();
     getIt.allowReassignment = true;
 
-    // Create and register the mock repository
     mockRepository = MockHabitsRepository();
     getIt.registerLazySingleton<IHabitsRepository>(() => mockRepository);
 
-    // Initialize the service to test
     habitsService = HabitsService();
   });
 
@@ -36,7 +32,6 @@ void main() {
 
       habitsService.addHabit(habit);
 
-      // Verify the repository's addHabit method is called with the correct argument
       verify(mockRepository.addHabit(habit)).called(1);
     });
 
@@ -45,7 +40,6 @@ void main() {
 
       habitsService.removeHabit(habitId);
 
-      // Verify the repository's removeHabit method is called with the correct argument
       verify(mockRepository.removeHabit(habitId)).called(1);
     });
 
@@ -59,27 +53,22 @@ void main() {
         )
       ];
 
-      // Stub the repository to return a predefined list of habits
       when(mockRepository.getHabits()).thenReturn(habits);
 
       final result = habitsService.getHabits();
 
-      // Check that the service returns the correct list of habits
       expect(result, habits);
 
-      // Verify the repository's getHabits method is called
       verify(mockRepository.getHabits()).called(1);
     });
 
     test('removes a non-existent habit', () {
       final habitId = 999;
 
-      // Stub the repository to allow calling removeHabit
       when(mockRepository.removeHabit(habitId)).thenReturn(null);
 
       habitsService.removeHabit(habitId);
 
-      // Verify the repository's removeHabit method is called
       verify(mockRepository.removeHabit(habitId)).called(1);
     });
 

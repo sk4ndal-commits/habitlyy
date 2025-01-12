@@ -4,6 +4,7 @@ import 'package:habitlyy/habits/viewmodels/habit_viewmodel.dart';
 import 'package:habitlyy/service_locator.dart';
 import 'habit_view.dart';
 
+/// A stateful widget that displays a list of habits.
 class HabitsView extends StatefulWidget {
   const HabitsView({super.key});
 
