@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:habitlyy/viewmodels/habits/habit_viewmodel.dart';
 
@@ -12,7 +14,8 @@ class HabitsProvider with ChangeNotifier {
   }
 
   void updateInvestedHours(TimeInvestmentHabitViewModel habit, double hours) {
-    habit.investedHours += hours;
+
+    habit.investedHours = min(habit.targetHours, habit.investedHours + hours);
     notifyListeners();
   }
 }

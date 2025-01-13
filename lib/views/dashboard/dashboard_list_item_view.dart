@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:habitlyy/viewmodels/habits/habit_viewmodel.dart';
 import '../../providers/habit_provider.dart';
+import 'dart:async';
 
 class DashboardListItemView extends StatefulWidget {
   final TimeInvestmentHabitViewModel habit;
@@ -86,62 +87,111 @@ class _DashboardListItemViewState extends State<DashboardListItemView> {
   void _showUpdateInvestedHoursDialog(
       BuildContext context, TimeInvestmentHabitViewModel habit) {
     final investedHoursController = TextEditingController();
+    Timer? timer;
+    int seconds = 0;
+
+    void startTimer(StateSetter updateState) {
+      timer = Timer.periodic(Duration(seconds: 1), (timer) {
+        updateState(() {
+          seconds++;
+        });
+      });
+    }
+
+    void stopTimer() {
+      timer?.cancel();
+      final hours = seconds / 3600;
+      investedHoursController.text = hours.toStringAsFixed(4);
+    }
+
+    String formatTime(int seconds) {
+      final int hours = seconds ~/ 3600;
+      final int minutes = (seconds % 3600) ~/ 60;
+      final int remainingSeconds = seconds % 60;
+      return '$hours:${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+    }
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Update Invested Hours'),
-          content: Form(
-            key: _formKey,
-            child: TextFormField(
-              controller: investedHoursController,
-              decoration: InputDecoration(labelText: 'Invested Hours'),
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a value';
-                }
-                final number = double.tryParse(value);
-                if (number == null || number <= 0) {
-                  return 'Please enter a number greater than 0';
-                }
-                return null;
-              },
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Cancel'),
-              style: TextButton.styleFrom(foregroundColor: Colors.green),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Save'),
-              style: TextButton.styleFrom(foregroundColor: Colors.green),
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  final newInvestedHours =
-                      double.tryParse(investedHoursController.text);
-                  if (newInvestedHours != null) {
-                    Provider.of<HabitsProvider>(context, listen: false)
-                        .updateInvestedHours(widget.habit, newInvestedHours);
-                    setState(() {});
-                    widget.onHabitUpdated();
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Update Invested Hours'),
+              content: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () => startTimer(setState),
+                          child: Text('Start Timer'),
+                        ),
+                        ElevatedButton(
+                          onPressed: stopTimer,
+                          child: Text('Stop Timer'),
+                        ),
+                      ],
+                    ),
+                    Text('Timer: ${formatTime(seconds)}'),
+                    SizedBox(height: 16.0),
+                    TextFormField(
+                      controller: investedHoursController,
+                      decoration: InputDecoration(labelText: 'Invested Hours'),
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a value';
+                        }
+                        final number = double.tryParse(value);
+                        if (number == null || number <= 0) {
+                          return 'Please enter a number greater than 0';
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Cancel'),
+                  style: TextButton.styleFrom(foregroundColor: Colors.green),
+                  onPressed: () {
+                    stopTimer();
                     Navigator.of(context).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Invested hours updated'),
-                        duration: Duration(seconds: 1),
-                      ),
-                    );
-                  }
-                }
-              },
-            ),
-          ],
+                  },
+                ),
+                TextButton(
+                  child: Text('Save'),
+                  style: TextButton.styleFrom(foregroundColor: Colors.green),
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      final newInvestedHours =
+                          double.tryParse(investedHoursController.text);
+                      if (newInvestedHours != null) {
+                        Provider.of<HabitsProvider>(context, listen: false)
+                            .updateInvestedHours(
+                                widget.habit, newInvestedHours);
+                        setState(() {});
+                        widget.onHabitUpdated();
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Invested hours updated'),
+                            duration: Duration(seconds: 1),
+                          ),
+                        );
+                      }
+                    }
+                  },
+                ),
+              ],
+            );
+          },
         );
       },
     );
