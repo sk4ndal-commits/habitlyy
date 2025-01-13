@@ -25,7 +25,7 @@ class HabitsDummyRepository implements IHabitsRepository {
           priority: HabitPriority.HIGH,
           startDate: DateTime.now().subtract(Duration(days: index)),
           deadline: DateTime.now().add(Duration(days: index)),
-          targetHours: index * 1.0,
+          targetHours: index * 1.0 + 0.5,
           frequencyDays: (index % 2 == 0
               ? [_frequencyDays[index % 7]]
               : [_frequencyDays[index % 7], _frequencyDays[(index + 1) % 7]])));

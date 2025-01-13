@@ -73,6 +73,7 @@ class _DashboardGraphViewState extends State<DashboardGraphView> {
             ],
           ),
         ),
+        SizedBox(height: 8.0),
         Padding(
           padding: EdgeInsets.all(12.0),
           child: Column(
