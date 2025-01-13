@@ -32,7 +32,7 @@ class DashboardView extends StatelessWidget {
                 children: [
                   SizedBox(height: 8.0),
                   Container(
-                    height: 200,
+                    height: 220,
                     child: DashboardGraphView(),
                   ),
                 ],
