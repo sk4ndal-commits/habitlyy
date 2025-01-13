@@ -4,8 +4,7 @@ import '../../enums/frequency_days.dart';
 import '../../enums/habit_priority.dart';
 import '../../viewmodels/habits/habit_viewmodel.dart';
 
-/// A widget that displays a habit with options to edit or delete it.
-class HabitView extends StatelessWidget {
+class HabitView extends StatefulWidget {
   final TimeInvestmentHabitViewModel habit;
   final VoidCallback onDelete;
 
@@ -16,6 +15,11 @@ class HabitView extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _HabitViewState createState() => _HabitViewState();
+}
+
+class _HabitViewState extends State<HabitView> {
+  @override
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -25,7 +29,7 @@ class HabitView extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                habit.title,
+                widget.habit.title,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
               ),
             ),
@@ -36,7 +40,7 @@ class HabitView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12.0),
               ),
               child: Text(
-                habit.priority.toString().split('.').last,
+                widget.habit.priority.toString().split('.').last,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 10.0,
@@ -52,7 +56,7 @@ class HabitView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12.0),
               ),
               child: Text(
-                _abbreviateFrequencyDays(habit.frequencyDays),
+                _abbreviateFrequencyDays(widget.habit.frequencyDays),
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 10.0,
@@ -69,7 +73,8 @@ class HabitView extends StatelessWidget {
               children: [
                 Icon(Icons.calendar_month, size: 16.0, color: Colors.grey),
                 SizedBox(width: 4.0),
-                Text('${habit.startDate.toLocal().toString().split(' ')[0]}'),
+                Text(
+                    '${widget.habit.startDate.toLocal().toString().split(' ')[0]}'),
               ],
             ),
             Row(
@@ -77,14 +82,15 @@ class HabitView extends StatelessWidget {
                 Icon(Icons.calendar_month_outlined,
                     size: 16.0, color: Colors.grey),
                 SizedBox(width: 4.0),
-                Text('${habit.deadline.toLocal().toString().split(' ')[0]}'),
+                Text(
+                    '${widget.habit.deadline.toLocal().toString().split(' ')[0]}'),
               ],
             ),
             Row(
               children: [
                 Icon(Icons.access_time, size: 16.0, color: Colors.grey),
                 SizedBox(width: 4.0),
-                Text('${habit.targetHours}h'),
+                Text('${widget.habit.targetHours}h'),
               ],
             ),
           ],
@@ -144,52 +150,118 @@ class HabitView extends StatelessWidget {
 
   void _showEditDialog(BuildContext context) {
     TextEditingController startDateController = TextEditingController(
-        text: habit.startDate.toLocal().toString().split(' ')[0]);
+        text: widget.habit.startDate.toLocal().toString().split(' ')[0]);
     TextEditingController deadlineController = TextEditingController(
-        text: habit.deadline.toLocal().toString().split(' ')[0]);
+        text: widget.habit.deadline.toLocal().toString().split(' ')[0]);
     TextEditingController targetHoursController =
-        TextEditingController(text: habit.targetHours.toString());
-    HabitPriority selectedPriority = habit.priority;
+        TextEditingController(text: widget.habit.targetHours.toString());
+    HabitPriority selectedPriority = widget.habit.priority;
+    List<FrequencyDay> selectedFrequencyDays = [];
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('${habit.title}'),
+          title: Text('${widget.habit.title}'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 8.0),
-              Text("Priority"),
-              DropdownButton<HabitPriority>(
-                value: selectedPriority,
-                onChanged: (HabitPriority? newValue) {
-                  if (newValue != null) {
-                    selectedPriority = newValue;
-                  }
-                },
-                items: HabitPriority.values.map((HabitPriority priority) {
-                  return DropdownMenuItem<HabitPriority>(
-                    value: priority,
-                    child: Text(priority.toString().split('.').last),
-                  );
-                }).toList(),
+              Row(
+                children: [
+                  Text("Priority"),
+                  SizedBox(width: 8.0),
+                  DropdownButton<HabitPriority>(
+                    value: selectedPriority,
+                    onChanged: (HabitPriority? newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          selectedPriority = newValue;
+                        });
+                      }
+                    },
+                    items: HabitPriority.values.map((HabitPriority priority) {
+                      return DropdownMenuItem<HabitPriority>(
+                        value: priority,
+                        child: Text(priority.toString().split('.').last),
+                      );
+                    }).toList(),
+                  ),
+                ],
               ),
               SizedBox(height: 8.0),
               TextField(
                 controller: startDateController,
                 decoration: InputDecoration(labelText: 'Start Date'),
+                readOnly: true,
+                onTap: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                  );
+                  if (pickedDate != null) {
+                    setState(() {
+                      startDateController.text =
+                          pickedDate.toLocal().toString().split(' ')[0];
+                    });
+                  }
+                },
               ),
               SizedBox(height: 8.0),
               TextField(
                 controller: deadlineController,
                 decoration: InputDecoration(labelText: 'Deadline'),
+                readOnly: true,
+                onTap: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                  );
+                  if (pickedDate != null) {
+                    setState(() {
+                      deadlineController.text =
+                          pickedDate.toLocal().toString().split(' ')[0];
+                    });
+                  }
+                },
               ),
               SizedBox(height: 8.0),
               TextField(
                 controller: targetHoursController,
                 decoration: InputDecoration(labelText: 'Target Hours'),
+              ),
+              SizedBox(height: 8.0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Frequency Days'),
+                  ),
+                  SizedBox(width: 8.0),
+                  Wrap(
+                    spacing: 8.0,
+                    children: FrequencyDay.values.map((day) {
+                      return ChoiceChip(
+                        label: Text(
+                            day.toString().split('.').last.substring(0, 2)),
+                        selected: selectedFrequencyDays.contains(day),
+                        onSelected: (bool selected) {
+                          setState(() {
+                            selected
+                                ? selectedFrequencyDays.add(day)
+                                : selectedFrequencyDays.remove(day);
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                ],
               ),
             ],
           ),
@@ -205,11 +277,19 @@ class HabitView extends StatelessWidget {
               child: Text('Save'),
               style: TextButton.styleFrom(foregroundColor: Colors.green),
               onPressed: () {
-                // Update the habit details
-                habit.priority = selectedPriority;
-                habit.startDate = DateTime.parse(startDateController.text);
-                habit.deadline = DateTime.parse(deadlineController.text);
-                habit.targetHours = double.parse(targetHoursController.text);
+                setState(() {
+                  // Update the habit details
+                  widget.habit.priority = selectedPriority;
+                  widget.habit.startDate =
+                      DateTime.parse(startDateController.text);
+                  widget.habit.deadline =
+                      DateTime.parse(deadlineController.text);
+                  widget.habit.targetHours =
+                      double.parse(targetHoursController.text);
+                  if (selectedFrequencyDays.isNotEmpty) {
+                    widget.habit.frequencyDays = selectedFrequencyDays;
+                  }
+                });
 
                 // Close the dialog
                 Navigator.of(context).pop();
@@ -234,7 +314,7 @@ class HabitView extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(habit.title),
+          title: Text(widget.habit.title),
           content: Text('Do you really want to delete this habit?'),
           actions: <Widget>[
             TextButton(
@@ -248,11 +328,11 @@ class HabitView extends StatelessWidget {
               child: Text('Yes'),
               style: TextButton.styleFrom(foregroundColor: Colors.green),
               onPressed: () {
-                onDelete();
+                widget.onDelete();
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('${habit.title} deleted'),
+                    content: Text('${widget.habit.title} deleted'),
                     duration: Duration(seconds: 1),
                   ),
                 );
