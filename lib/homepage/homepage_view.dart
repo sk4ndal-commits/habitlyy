@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../generated/l10n.dart';
 import '../views/dashboard/dashboard_view.dart';
 import '../views/habits/habits_list_view.dart';
 
@@ -48,15 +49,15 @@ class _HomePageViewState extends State<HomePageView> {
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard),
-            label: '',
+            label: S.of(context)?.navbar_home ?? '',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.track_changes),
-            label: '',
+            label: S.of(context)?.navbar_habits ?? '',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: '',
+            label: S.of(context)?.navbar_profile ?? '',
           ),
         ],
         currentIndex: _selectedIndex,
