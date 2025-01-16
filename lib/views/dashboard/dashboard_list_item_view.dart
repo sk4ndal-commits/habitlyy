@@ -26,61 +26,77 @@ class _DashboardListItemViewState extends State<DashboardListItemView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  widget.habit.title,
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                  decoration: BoxDecoration(
-                    color: Colors.orange,
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  child: Text(
-                    widget.habit.priority.toString().split('.').last,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {
-                    _showUpdateInvestedHoursDialog(context, widget.habit);
-                  },
-                  icon: Icon(Icons.update, color: Colors.orange),
-                ),
-              ],
-            ),
+            _buildHeader(),
             SizedBox(height: 8.0),
-            LinearProgressIndicator(
-              value: widget.habit.investedHours / widget.habit.targetHours,
-              backgroundColor: Colors.grey[300],
-              color: Colors.green,
-            ),
+            _buildProgressIndicator(),
             SizedBox(height: 8.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '${widget.habit.investedHours} / ${widget.habit.targetHours} hours',
-                  style: TextStyle(
-                    fontSize: 12.0,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
+            _buildHoursText(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          widget.habit.title,
+          style: TextStyle(
+            fontSize: 16.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        _buildPriorityChip(),
+        IconButton(
+          onPressed: () {
+            _showUpdateInvestedHoursDialog(context, widget.habit);
+          },
+          icon: Icon(Icons.update, color: Colors.orange),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPriorityChip() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      decoration: BoxDecoration(
+        color: Colors.orange,
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: Text(
+        widget.habit.priority.toString().split('.').last,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 10.0,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProgressIndicator() {
+    return LinearProgressIndicator(
+      value: widget.habit.investedHours / widget.habit.targetHours,
+      backgroundColor: Colors.grey[300],
+      color: Colors.green,
+    );
+  }
+
+  Widget _buildHoursText() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          '${widget.habit.investedHours} / ${widget.habit.targetHours} hours',
+          style: TextStyle(
+            fontSize: 12.0,
+            color: Colors.grey,
+          ),
+        ),
+      ],
     );
   }
 
@@ -123,77 +139,90 @@ class _DashboardListItemViewState extends State<DashboardListItemView> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () => startTimer(setState),
-                          child: Text('Start Timer'),
-                        ),
-                        ElevatedButton(
-                          onPressed: stopTimer,
-                          child: Text('Stop Timer'),
-                        ),
-                      ],
-                    ),
+                    _buildTimerButtons(setState, startTimer, stopTimer),
                     Text('Timer: ${formatTime(seconds)}'),
                     SizedBox(height: 16.0),
-                    TextFormField(
-                      controller: investedHoursController,
-                      decoration: InputDecoration(labelText: 'Invested Hours'),
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a value';
-                        }
-                        final number = double.tryParse(value);
-                        if (number == null || number <= 0) {
-                          return 'Please enter a number greater than 0';
-                        }
-                        return null;
-                      },
-                    ),
+                    _buildInvestedHoursField(investedHoursController),
                   ],
                 ),
               ),
-              actions: <Widget>[
-                TextButton(
-                  child: Text('Cancel'),
-                  style: TextButton.styleFrom(foregroundColor: Colors.green),
-                  onPressed: () {
-                    stopTimer();
-                    Navigator.of(context).pop();
-                  },
-                ),
-                TextButton(
-                  child: Text('Save'),
-                  style: TextButton.styleFrom(foregroundColor: Colors.green),
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      final newInvestedHours =
-                          double.tryParse(investedHoursController.text);
-                      if (newInvestedHours != null) {
-                        Provider.of<HabitsProvider>(context, listen: false)
-                            .updateInvestedHours(
-                                widget.habit, newInvestedHours);
-                        setState(() {});
-                        widget.onHabitUpdated();
-                        Navigator.of(context).pop();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Invested hours updated'),
-                            duration: Duration(seconds: 1),
-                          ),
-                        );
-                      }
-                    }
-                  },
-                ),
-              ],
+              actions: _buildDialogActions(
+                  context, investedHoursController, stopTimer),
             );
           },
         );
       },
     );
+  }
+
+  Widget _buildTimerButtons(StateSetter setState,
+      void Function(StateSetter) startTimer, void Function() stopTimer) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        ElevatedButton(
+          onPressed: () => startTimer(setState),
+          child: Text('Start Timer'),
+        ),
+        ElevatedButton(
+          onPressed: stopTimer,
+          child: Text('Stop Timer'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInvestedHoursField(TextEditingController controller) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(labelText: 'Invested Hours'),
+      keyboardType: TextInputType.number,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter a value';
+        }
+        final number = double.tryParse(value);
+        if (number == null || number <= 0) {
+          return 'Please enter a number greater than 0';
+        }
+        return null;
+      },
+    );
+  }
+
+  List<Widget> _buildDialogActions(BuildContext context,
+      TextEditingController controller, void Function() stopTimer) {
+    return [
+      TextButton(
+        child: Text('Cancel'),
+        style: TextButton.styleFrom(foregroundColor: Colors.green),
+        onPressed: () {
+          stopTimer();
+          Navigator.of(context).pop();
+        },
+      ),
+      TextButton(
+        child: Text('Save'),
+        style: TextButton.styleFrom(foregroundColor: Colors.green),
+        onPressed: () {
+          if (_formKey.currentState!.validate()) {
+            final newInvestedHours = double.tryParse(controller.text);
+            if (newInvestedHours != null) {
+              Provider.of<HabitsProvider>(context, listen: false)
+                  .updateInvestedHours(widget.habit, newInvestedHours);
+              setState(() {});
+              widget.onHabitUpdated();
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Invested hours updated'),
+                  duration: Duration(seconds: 1),
+                ),
+              );
+            }
+          }
+        },
+      ),
+    ];
   }
 }

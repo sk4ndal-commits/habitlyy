@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:habitlyy/providers/habit_provider.dart';
+import 'package:habitlyy/views/homepage/homepage_view.dart';
 import 'package:provider/provider.dart';
 import 'package:habitlyy/service_locator.dart';
 import 'generated/l10n.dart';
-import 'homepage/homepage_view.dart';
 
 void main() {
   setupLocator();

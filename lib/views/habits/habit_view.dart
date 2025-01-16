@@ -19,90 +19,117 @@ class HabitView extends StatefulWidget {
 }
 
 class _HabitViewState extends State<HabitView> {
+  late HabitPriority _selectedPriority;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedPriority = widget.habit.priority;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: ListTile(
         contentPadding: EdgeInsets.all(16.0),
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                widget.habit.title,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-              decoration: BoxDecoration(
-                color: Colors.orange,
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              child: Text(
-                widget.habit.priority.toString().split('.').last,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 10.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            SizedBox(width: 8.0),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-              decoration: BoxDecoration(
-                color: Colors.green,
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              child: Text(
-                _abbreviateFrequencyDays(widget.habit.frequencyDays),
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 10.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
+        title: _buildTitle(),
+        subtitle: _buildSubtitle(),
+        trailing: _buildTrailingButtons(),
+      ),
+    );
+  }
+
+  Widget _buildTitle() {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            widget.habit.title,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+          ),
         ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.calendar_month, size: 16.0, color: Colors.grey),
-                SizedBox(width: 4.0),
-                Text(
-                    '${widget.habit.startDate.toLocal().toString().split(' ')[0]}'),
-              ],
-            ),
-            Row(
-              children: [
-                Icon(Icons.calendar_month_outlined,
-                    size: 16.0, color: Colors.grey),
-                SizedBox(width: 4.0),
-                Text(
-                    '${widget.habit.deadline.toLocal().toString().split(' ')[0]}'),
-              ],
-            ),
-            Row(
-              children: [
-                Icon(Icons.access_time, size: 16.0, color: Colors.grey),
-                SizedBox(width: 4.0),
-                Text('${widget.habit.targetHours}h'),
-              ],
-            ),
-          ],
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildEditButton(context),
-            _buildDeleteButton(context),
-          ],
+        _buildPriorityChip(),
+        SizedBox(width: 8.0),
+        _buildFrequencyDaysChip(),
+      ],
+    );
+  }
+
+  Widget _buildPriorityChip() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      decoration: BoxDecoration(
+        color: Colors.orange,
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: Text(
+        widget.habit.priority.toString().split('.').last,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 10.0,
+          fontWeight: FontWeight.bold,
         ),
       ),
+    );
+  }
+
+  Widget _buildFrequencyDaysChip() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      decoration: BoxDecoration(
+        color: Colors.green,
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: Text(
+        _abbreviateFrequencyDays(widget.habit.frequencyDays),
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 10.0,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubtitle() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildDateRow(Icons.calendar_month, widget.habit.startDate),
+        _buildDateRow(Icons.calendar_month_outlined, widget.habit.deadline),
+        _buildTargetHoursRow(),
+      ],
+    );
+  }
+
+  Widget _buildDateRow(IconData icon, DateTime date) {
+    return Row(
+      children: [
+        Icon(icon, size: 16.0, color: Colors.grey),
+        SizedBox(width: 4.0),
+        Text('${date.toLocal().toString().split(' ')[0]}'),
+      ],
+    );
+  }
+
+  Widget _buildTargetHoursRow() {
+    return Row(
+      children: [
+        Icon(Icons.access_time, size: 16.0, color: Colors.grey),
+        SizedBox(width: 4.0),
+        Text('${widget.habit.targetHours}h'),
+      ],
+    );
+  }
+
+  Widget _buildTrailingButtons() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildEditButton(context),
+        _buildDeleteButton(context),
+      ],
     );
   }
 
@@ -155,7 +182,6 @@ class _HabitViewState extends State<HabitView> {
         text: widget.habit.deadline.toLocal().toString().split(' ')[0]);
     TextEditingController targetHoursController =
         TextEditingController(text: widget.habit.targetHours.toString());
-    HabitPriority selectedPriority = widget.habit.priority;
     List<FrequencyDay> selectedFrequencyDays = [];
 
     showDialog(
@@ -163,150 +189,181 @@ class _HabitViewState extends State<HabitView> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('${widget.habit.title}'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 8.0),
-              Row(
-                children: [
-                  Text("Priority"),
-                  SizedBox(width: 8.0),
-                  DropdownButton<HabitPriority>(
-                    value: selectedPriority,
-                    onChanged: (HabitPriority? newValue) {
-                      if (newValue != null) {
-                        setState(() {
-                          selectedPriority = newValue;
-                        });
-                      }
-                    },
-                    items: HabitPriority.values.map((HabitPriority priority) {
-                      return DropdownMenuItem<HabitPriority>(
-                        value: priority,
-                        child: Text(priority.toString().split('.').last),
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-              SizedBox(height: 8.0),
-              TextField(
-                controller: startDateController,
-                decoration: InputDecoration(labelText: 'Start Date'),
-                readOnly: true,
-                onTap: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101),
-                  );
-                  if (pickedDate != null) {
-                    setState(() {
-                      startDateController.text =
-                          pickedDate.toLocal().toString().split(' ')[0];
-                    });
-                  }
-                },
-              ),
-              SizedBox(height: 8.0),
-              TextField(
-                controller: deadlineController,
-                decoration: InputDecoration(labelText: 'Deadline'),
-                readOnly: true,
-                onTap: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101),
-                  );
-                  if (pickedDate != null) {
-                    setState(() {
-                      deadlineController.text =
-                          pickedDate.toLocal().toString().split(' ')[0];
-                    });
-                  }
-                },
-              ),
-              SizedBox(height: 8.0),
-              TextField(
-                controller: targetHoursController,
-                decoration: InputDecoration(labelText: 'Target Hours'),
-              ),
-              SizedBox(height: 8.0),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('Frequency Days'),
-                  ),
-                  SizedBox(width: 8.0),
-                  Wrap(
-                    spacing: 8.0,
-                    children: FrequencyDay.values.map((day) {
-                      return ChoiceChip(
-                        label: Text(
-                            day.toString().split('.').last.substring(0, 2)),
-                        selected: selectedFrequencyDays.contains(day),
-                        onSelected: (bool selected) {
-                          setState(() {
-                            selected
-                                ? selectedFrequencyDays.add(day)
-                                : selectedFrequencyDays.remove(day);
-                          });
-                        },
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-            ],
+          content: _buildEditDialogContent(
+            startDateController,
+            deadlineController,
+            targetHoursController,
+            selectedFrequencyDays,
           ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Cancel'),
-              style: TextButton.styleFrom(foregroundColor: Colors.green),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Save'),
-              style: TextButton.styleFrom(foregroundColor: Colors.green),
-              onPressed: () {
-                setState(() {
-                  // Update the habit details
-                  widget.habit.priority = selectedPriority;
-                  widget.habit.startDate =
-                      DateTime.parse(startDateController.text);
-                  widget.habit.deadline =
-                      DateTime.parse(deadlineController.text);
-                  widget.habit.targetHours =
-                      double.parse(targetHoursController.text);
-                  if (selectedFrequencyDays.isNotEmpty) {
-                    widget.habit.frequencyDays = selectedFrequencyDays;
-                  }
-                });
-
-                // Close the dialog
-                Navigator.of(context).pop();
-
-                // Show SnackBar
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Changes saved'),
-                    duration: Duration(seconds: 1),
-                  ),
-                );
-              },
-            ),
-          ],
+          actions: _buildEditDialogActions(
+            context,
+            startDateController,
+            deadlineController,
+            targetHoursController,
+            selectedFrequencyDays,
+          ),
         );
       },
     );
+  }
+
+  Widget _buildEditDialogContent(
+    TextEditingController startDateController,
+    TextEditingController deadlineController,
+    TextEditingController targetHoursController,
+    List<FrequencyDay> selectedFrequencyDays,
+  ) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 8.0),
+        _buildPriorityDropdown(),
+        SizedBox(height: 8.0),
+        _buildDatePickerField('Start Date', startDateController),
+        SizedBox(height: 8.0),
+        _buildDatePickerField('Deadline', deadlineController),
+        SizedBox(height: 8.0),
+        _buildTextField('Target Hours', targetHoursController),
+        SizedBox(height: 8.0),
+        _buildFrequencyDaysChips(selectedFrequencyDays),
+      ],
+    );
+  }
+
+  Widget _buildPriorityDropdown() {
+    return Row(
+      children: [
+        Text("Priority"),
+        SizedBox(width: 8.0),
+        StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return DropdownButton<HabitPriority>(
+              value: _selectedPriority,
+              onChanged: (HabitPriority? newValue) {
+                if (newValue != null) {
+                  setState(() {
+                    _selectedPriority = newValue;
+                  });
+                }
+              },
+              items: HabitPriority.values.map((HabitPriority priority) {
+                return DropdownMenuItem<HabitPriority>(
+                  value: priority,
+                  child: Text(priority.toString().split('.').last),
+                );
+              }).toList(),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDatePickerField(String label, TextEditingController controller) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(labelText: label),
+      readOnly: true,
+      onTap: () async {
+        DateTime? pickedDate = await showDatePicker(
+          context: context,
+          initialDate: DateTime.now(),
+          firstDate: DateTime(2000),
+          lastDate: DateTime(2101),
+        );
+        if (pickedDate != null) {
+          setState(() {
+            controller.text = pickedDate.toLocal().toString().split(' ')[0];
+          });
+        }
+      },
+    );
+  }
+
+  Widget _buildTextField(String label, TextEditingController controller) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(labelText: label),
+    );
+  }
+
+  Widget _buildFrequencyDaysChips(List<FrequencyDay> selectedFrequencyDays) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text('Frequency Days'),
+        ),
+        SizedBox(width: 8.0),
+        StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Wrap(
+              spacing: 8.0,
+              children: FrequencyDay.values.map((day) {
+                return ChoiceChip(
+                  label: Text(day.toString().split('.').last.substring(0, 2)),
+                  selected: selectedFrequencyDays.contains(day),
+                  onSelected: (bool selected) {
+                    setState(() {
+                      selected
+                          ? selectedFrequencyDays.add(day)
+                          : selectedFrequencyDays.remove(day);
+                    });
+                  },
+                );
+              }).toList(),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _buildEditDialogActions(
+    BuildContext context,
+    TextEditingController startDateController,
+    TextEditingController deadlineController,
+    TextEditingController targetHoursController,
+    List<FrequencyDay> selectedFrequencyDays,
+  ) {
+    return [
+      TextButton(
+        child: Text('Cancel'),
+        style: TextButton.styleFrom(foregroundColor: Colors.green),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+      ),
+      TextButton(
+        child: Text('Save'),
+        style: TextButton.styleFrom(foregroundColor: Colors.green),
+        onPressed: () {
+          setState(() {
+            // Update the habit details
+            widget.habit.priority = _selectedPriority;
+            widget.habit.startDate = DateTime.parse(startDateController.text);
+            widget.habit.deadline = DateTime.parse(deadlineController.text);
+            widget.habit.targetHours = double.parse(targetHoursController.text);
+            if (selectedFrequencyDays.isNotEmpty) {
+              widget.habit.frequencyDays = selectedFrequencyDays;
+            }
+          });
+
+          // Close the dialog
+          Navigator.of(context).pop();
+
+          // Show SnackBar
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Changes saved'),
+              duration: Duration(seconds: 1),
+            ),
+          );
+        },
+      ),
+    ];
   }
 
   void _showDeleteDialog(BuildContext context) {

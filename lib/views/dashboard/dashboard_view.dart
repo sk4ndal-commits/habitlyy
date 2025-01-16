@@ -9,55 +9,49 @@ class DashboardView extends StatelessWidget {
       body: Column(
         children: [
           SizedBox(height: 32.0),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                "Today's Progress",
-                style: TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          // First row: Graph
-          Card(
-            margin: EdgeInsets.all(16.0),
-            child: Padding(
-              padding: EdgeInsets.all(12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 8.0),
-                  Container(
-                    height: 220,
-                    child: DashboardGraphView(),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          // Heading: Today's Tasks
+          _buildSectionTitle(context, "Today's Progress"),
+          _buildGraphCard(),
           SizedBox(height: 32.0),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                "Today's Tasks",
-                style: TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
+          _buildSectionTitle(context, "Today's Tasks"),
           SizedBox(height: 16.0),
           DashboardListView(),
           SizedBox(height: 16.0),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.0),
+        child: Text(
+          title,
+          style: TextStyle(
+            fontSize: 20.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGraphCard() {
+    return Card(
+      margin: EdgeInsets.all(16.0),
+      child: Padding(
+        padding: EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 8.0),
+            Container(
+              height: 220,
+              child: DashboardGraphView(),
+            ),
+          ],
+        ),
       ),
     );
   }

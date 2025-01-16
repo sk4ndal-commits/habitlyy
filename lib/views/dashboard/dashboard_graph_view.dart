@@ -48,51 +48,59 @@ class _DashboardGraphViewState extends State<DashboardGraphView> {
 
     return Column(
       children: [
-        Container(
-          height: 150,
-          child: SfCircularChart(
-            series: <CircularSeries>[
-              PieSeries<PieChartData, String>(
-                dataSource: data,
-                xValueMapper: (PieChartData data, _) => data.label,
-                yValueMapper: (PieChartData data, _) => data.value,
-                pointColorMapper: (PieChartData data, _) => data.color,
-                dataLabelMapper: (PieChartData data, _) =>
-                    '${data.label} \n ${data.value.toStringAsFixed(1)}h',
-                dataLabelSettings: DataLabelSettings(
-                  isVisible: true,
-                  textStyle:
-                      TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                  labelPosition: ChartDataLabelPosition.outside,
-                  connectorLineSettings: ConnectorLineSettings(
-                    type: ConnectorType.curve,
-                    length: '10%',
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        _buildPieChart(data),
         SizedBox(height: 8.0),
-        Padding(
-          padding: EdgeInsets.all(12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              LinearProgressIndicator(
-                value: progress,
-                backgroundColor: Colors.grey[300],
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-              ),
-              SizedBox(height: 8.0),
-              Text(
-                '$completedTasks/$totalTasks tasks completed',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-        )
+        _buildProgressSection(progress, completedTasks, totalTasks),
       ],
+    );
+  }
+
+  Widget _buildPieChart(List<PieChartData> data) {
+    return Container(
+      height: 150,
+      child: SfCircularChart(
+        series: <CircularSeries>[
+          PieSeries<PieChartData, String>(
+            dataSource: data,
+            xValueMapper: (PieChartData data, _) => data.label,
+            yValueMapper: (PieChartData data, _) => data.value,
+            pointColorMapper: (PieChartData data, _) => data.color,
+            dataLabelMapper: (PieChartData data, _) =>
+                '${data.label} \n ${data.value.toStringAsFixed(1)}h',
+            dataLabelSettings: DataLabelSettings(
+              isVisible: true,
+              textStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              labelPosition: ChartDataLabelPosition.outside,
+              connectorLineSettings: ConnectorLineSettings(
+                type: ConnectorType.curve,
+                length: '10%',
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProgressSection(
+      double progress, int completedTasks, int totalTasks) {
+    return Padding(
+      padding: EdgeInsets.all(12.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          LinearProgressIndicator(
+            value: progress,
+            backgroundColor: Colors.grey[300],
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+          ),
+          SizedBox(height: 8.0),
+          Text(
+            '$completedTasks/$totalTasks tasks completed',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
     );
   }
 }
