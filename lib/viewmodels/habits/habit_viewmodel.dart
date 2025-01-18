@@ -17,6 +17,7 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
     required DateTime deadline,
     required this.targetHours,
     required List<FrequencyDay>? frequencyDays,
+    required int userId,
   }) : super(
           id: id,
           title: title,
@@ -24,6 +25,7 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
           startDate: startDate,
           deadline: deadline,
           frequencyDays: frequencyDays,
+          userId: userId,
         );
 
   void logTime(DateTime date, double hours) {

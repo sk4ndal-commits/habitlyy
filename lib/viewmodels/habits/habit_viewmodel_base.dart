@@ -12,6 +12,7 @@ class HabitViewModelBase {
   DateTime deadline;
   late DateTime lastUpdated;
   List<FrequencyDay>? frequencyDays;
+  final int userId;
 
   HabitViewModelBase({
     required this.id,
@@ -20,6 +21,7 @@ class HabitViewModelBase {
     required this.startDate,
     required this.deadline,
     required this.frequencyDays,
+    required this.userId,
   }) {
     completed = false;
     lastUpdated = DateTime.now();

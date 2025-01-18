@@ -3,36 +3,40 @@ import 'package:habitlyy/enums/frequency_days.dart';
 import '../../repositories/habits/habits_repository.dart';
 import '../../service_locator.dart';
 import '../../viewmodels/habits/habit_viewmodel.dart';
+import '../profile/iuser_service.dart';
 import 'ihabits_service.dart';
 
 class HabitsService implements IHabitsService {
   final _repository = getIt<IHabitsRepository>();
+  final userService = getIt<IUserService>();
 
   HabitsService();
 
-  @override
   void addHabit(TimeInvestmentHabitViewModel habit) {
     _repository.addHabit(habit);
   }
 
-  @override
   void removeHabit(int habitId) {
     _repository.removeHabit(habitId);
   }
 
-  @override
   List<TimeInvestmentHabitViewModel> getHabits() {
     return _repository.getHabits();
   }
 
-  @override
   List<TimeInvestmentHabitViewModel> getTodayHabits() {
     var today = getFrequencyDay(DateTime.now().weekday);
-    return _repository.getHabits().where((habit) {
+    return _repository
+        .getHabitsByUserId(userService.getCurrentUser()!.id)
+        .where((habit) {
       return habit.frequencyDays!.contains(today);
     }).toList();
   }
-  
+
+  List<TimeInvestmentHabitViewModel> getHabitsByUserId(int userId) {
+    return _repository.getHabitsByUserId(userId);
+  }
+
   FrequencyDay getFrequencyDay(int today) {
     switch (today) {
       case 1:

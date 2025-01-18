@@ -31,7 +31,8 @@ void main() {
         startDate: DateTime.now(),
         deadline: DateTime.now().add(Duration(days: 7)),
         targetHours: 10.0,
-        frequencyDays: null
+        frequencyDays: null,
+        userId: 1
       );
 
       habitsService.addHabit(habit);
@@ -56,7 +57,8 @@ void main() {
           startDate: DateTime.now(),
           deadline: DateTime.now().add(Duration(days: 7)),
           targetHours: 10.0,
-          frequencyDays: null
+          frequencyDays: null,
+          userId: 1
         )
       ];
 
@@ -87,7 +89,8 @@ void main() {
         startDate: DateTime.now(),
         deadline: DateTime.now().add(Duration(days: 7)),
         targetHours: 10.0,
-        frequencyDays: null
+        frequencyDays: null,
+        userId: 1
       );
       final habit2 = TimeInvestmentHabitViewModel(
         id: 2,
@@ -96,7 +99,8 @@ void main() {
         startDate: DateTime.now(),
         deadline: DateTime.now().add(Duration(days: 7)),
         targetHours: 20.0,
-        frequencyDays: null
+        frequencyDays: null,
+        userId: 1
       );
 
       habitsService.addHabit(habit1);

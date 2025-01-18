@@ -5,4 +5,5 @@ abstract class IHabitsService {
   void removeHabit(int habitId);
   List<TimeInvestmentHabitViewModel> getHabits();
   List<TimeInvestmentHabitViewModel> getTodayHabits();
+  List<TimeInvestmentHabitViewModel> getHabitsByUserId(int userId);
 }

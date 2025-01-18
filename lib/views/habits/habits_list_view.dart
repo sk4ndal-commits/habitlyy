@@ -1,8 +1,10 @@
+
 import 'package:flutter/material.dart';
 import 'package:habitlyy/service_locator.dart';
 import '../../enums/frequency_days.dart';
 import '../../enums/habit_priority.dart';
 import '../../services/habits/ihabits_service.dart';
+import '../../services/profile/iuser_service.dart';
 import '../../viewmodels/habits/habit_viewmodel.dart';
 import 'habit_view.dart';
 
@@ -16,6 +18,7 @@ class HabitsView extends StatefulWidget {
 
 class _HabitsViewState extends State<HabitsView> {
   final habitsService = getIt<IHabitsService>();
+  final userService = getIt<IUserService>();
   HabitPriority? _selectedPriority;
   bool _filterCompleted = false;
   bool _filterOverdue = false;
@@ -222,6 +225,7 @@ class _HabitsViewState extends State<HabitsView> {
               deadline: DateTime.parse(deadlineController.text),
               targetHours: double.parse(targetHoursController.text),
               frequencyDays: selectedFrequencyDays,
+              userId: userService.getCurrentUser()!.id,
             );
             setState(() {
               habitsService.addHabit(newHabit);
@@ -345,7 +349,9 @@ class _HabitsViewState extends State<HabitsView> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredHabits = habitsService.getHabits().where((habit) {
+    final filteredHabits = habitsService
+        .getHabitsByUserId(userService.getCurrentUser()!.id)
+        .where((habit) {
       if (_selectedPriority != null && habit.priority != _selectedPriority) {
         return false;
       }
