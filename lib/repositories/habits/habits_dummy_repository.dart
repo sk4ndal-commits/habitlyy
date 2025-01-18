@@ -41,7 +41,7 @@ class HabitsDummyRepository implements IHabitsRepository {
   }
 
   @override
-  void removeHabit(int habitId) {
+  void deleteHabit(int habitId) {
     _habits.removeWhere((habit) => habit.id == habitId);
   }
 
