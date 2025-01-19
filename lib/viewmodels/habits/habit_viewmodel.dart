@@ -28,6 +28,35 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
           userId: userId,
         );
 
+  factory TimeInvestmentHabitViewModel.fromMap(Map<String, dynamic> map) {
+    return TimeInvestmentHabitViewModel(
+      id: map['id'] as int,
+      title: map['title'] as String,
+      priority: HabitPriority.values.firstWhere(
+            (e) => e.toString() == map['priority'],
+      ),
+      startDate: DateTime.parse(map['startDate'] as String),
+      deadline: DateTime.parse(map['deadline'] as String),
+      targetHours: map['targetHours'] as double,
+      frequencyDays: (map['frequencyDays'] as String?)
+          ?.split(',')
+          .map((e) => FrequencyDay.values[int.parse(e)])
+          .toList(),
+      userId: map['userId'] as int,
+    )
+      ..investedHours = map['investedHours'] as double
+      ..progressLog = (map['progressLog'] as String).isNotEmpty
+          ? List<Map<String, dynamic>>.from(
+          (map['progressLog'] as String).split('|').map((log) {
+            final logParts = log.split(':');
+            return {
+              "date": logParts[0],
+              "hours": double.parse(logParts[1]),
+            };
+          }))
+          : [];
+  }
+
   void logTime(DateTime date, double hours) {
     // Log time and update total invested hours
     progressLog.add({'date': date, 'hours': hours});

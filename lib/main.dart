@@ -10,8 +10,9 @@ import 'package:provider/provider.dart';
 import 'package:habitlyy/service_locator.dart';
 import 'generated/l10n.dart';
 
-void main() {
-  setupLocator();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await setupLocator();
   runApp(MyApp());
 }
 

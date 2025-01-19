@@ -10,15 +10,21 @@ class DashboardListView extends StatefulWidget {
 }
 
 class _DashboardListViewState extends State<DashboardListView> {
-  @override
-  Widget build(BuildContext context) {
-    final habitsService = getIt<IHabitsService>();
-    final todayHabits = habitsService.getTodayHabits();
-    final filteredHabits = _filterAndSortHabits(todayHabits);
+  late Future<List<TimeInvestmentHabitViewModel>> _todayHabitsFuture;
 
-    return _buildHabitList(filteredHabits);
+  @override
+  void initState() {
+    super.initState();
+    _fetchTodayHabits(); // Initialize the future
   }
 
+  // Fetch today's habits asynchronously
+  void _fetchTodayHabits() {
+    final habitsService = getIt<IHabitsService>();
+    _todayHabitsFuture = habitsService.getTodayHabits(); // Assume this is a Future
+  }
+
+  // Filters and sorts the habits (not async since we already fetched the data)
   List<TimeInvestmentHabitViewModel> _filterAndSortHabits(
       List<TimeInvestmentHabitViewModel> habits) {
     final filteredHabits = habits
@@ -28,20 +34,48 @@ class _DashboardListViewState extends State<DashboardListView> {
     return filteredHabits;
   }
 
+  // Builds the widget for the filtered habits list
   Widget _buildHabitList(List<TimeInvestmentHabitViewModel> habits) {
-    return Expanded(
-      child: ListView.builder(
-        itemCount: habits.length,
-        itemBuilder: (context, index) {
-          final habit = habits[index];
-          return DashboardListItemView(
-            habit: habit,
-            onHabitUpdated: () {
-              setState(() {});
-            },
-          );
-        },
-      ),
+    return ListView.builder(
+      itemCount: habits.length,
+      itemBuilder: (context, index) {
+        final habit = habits[index];
+        return DashboardListItemView(
+          habit: habit,
+          onHabitUpdated: () {
+            // Refresh habits when updated
+            setState(() {
+              _fetchTodayHabits();
+            });
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<TimeInvestmentHabitViewModel>>(
+      future: _todayHabitsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          ); // Show loading indicator while fetching data
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text('Error: ${snapshot.error}'),
+          ); // Error handling
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(
+            child: Text('No habits for today'),
+          ); // Handle no data case
+        } else {
+          // Filter and sort the habits before rendering
+          final filteredHabits = _filterAndSortHabits(snapshot.data!);
+          return _buildHabitList(filteredHabits);
+        }
+      },
     );
   }
 }

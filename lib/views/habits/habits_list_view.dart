@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:habitlyy/service_locator.dart';
 import '../../enums/frequency_days.dart';
@@ -19,10 +18,24 @@ class HabitsView extends StatefulWidget {
 class _HabitsViewState extends State<HabitsView> {
   final habitsService = getIt<IHabitsService>();
   final userService = getIt<IUserService>();
+  late Future<List<TimeInvestmentHabitViewModel>> _habitsFuture;
   HabitPriority? _selectedPriority;
   bool _filterCompleted = false;
   bool _filterOverdue = false;
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchHabits();
+  }
+
+  void _fetchHabits() {
+    final currentUser = userService.getCurrentUser();
+    if (currentUser != null) {
+      _habitsFuture = habitsService.getHabitsByUserId(currentUser.id);
+    }
+  }
 
   void _addHabit() {
     final titleController = TextEditingController();
@@ -213,7 +226,7 @@ class _HabitsViewState extends State<HabitsView> {
       ),
       TextButton(
         child: Text('Add'),
-        onPressed: () {
+        onPressed: () async {
           if (_formKey.currentState!.validate()) {
             final newHabit = TimeInvestmentHabitViewModel(
               id: DateTime.now().millisecondsSinceEpoch,
@@ -225,16 +238,26 @@ class _HabitsViewState extends State<HabitsView> {
               frequencyDays: selectedFrequencyDays,
               userId: userService.getCurrentUser()!.id,
             );
-            setState(() {
-              habitsService.addHabit(newHabit);
-            });
-            Navigator.of(context).pop();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('${newHabit.title} added'),
-                duration: Duration(seconds: 1),
-              ),
-            );
+
+            try {
+              await habitsService.addHabit(newHabit); // Await adding habit
+              _fetchHabits(); // Refresh habit list
+              setState(() {}); // Rebuild UI
+              Navigator.of(context).pop(); // Close dialog
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('${newHabit.title} added'),
+                  duration: Duration(seconds: 1),
+                ),
+              );
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Error adding habit: $e'),
+                  duration: Duration(seconds: 20),
+                ),
+              );
+            }
           }
         },
       ),
@@ -345,62 +368,100 @@ class _HabitsViewState extends State<HabitsView> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredHabits = habitsService
-        .getHabitsByUserId(userService.getCurrentUser()!.id)
-        .where((habit) {
-      if (_selectedPriority != null && habit.priority != _selectedPriority) {
-        return false;
-      }
-      if (_filterCompleted && !habit.isCompleted()) {
-        return false;
-      }
-      if (_filterOverdue && !habit.isOverdue()) {
-        return false;
-      }
-      return true;
-    }).toList();
+    final currentUser = userService.getCurrentUser();
 
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.only(bottom: 80.0),
-        child: ListView.builder(
-          itemCount: filteredHabits.length,
-          itemBuilder: (context, index) {
-            final habit = filteredHabits[index];
-            return HabitView(
-              habit: habit,
-              onDelete: () {
-                setState(() {
-                  habitsService.removeHabit(habit.id);
-                });
+    if (currentUser == null) {
+      return Center(child: Text("No logged-in user")); // Handle no user case
+    }
+
+    return FutureBuilder<List<TimeInvestmentHabitViewModel>>(
+      future: _habitsFuture,
+      builder: (context, snapshot) {
+        Widget body;
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          body = Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          body = Center(child: Text("Error: ${snapshot.error}"));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          body = Center(child: Text("No habits found"));
+        } else {
+          // Filter habits based on the criteria
+          final filteredHabits = snapshot.data!.where((habit) {
+            if (_selectedPriority != null &&
+                habit.priority != _selectedPriority) {
+              return false;
+            }
+            if (_filterCompleted && !habit.isCompleted()) {
+              return false;
+            }
+            if (_filterOverdue && !habit.isOverdue()) {
+              return false;
+            }
+            return true;
+          }).toList();
+
+          body = Padding(
+            padding: const EdgeInsets.only(bottom: 80.0),
+            child: ListView.builder(
+              itemCount: filteredHabits.length,
+              itemBuilder: (context, index) {
+                final habit = filteredHabits[index];
+                return HabitView(
+                  habit: habit,
+                  onDelete: () async {
+                    try {
+                      await habitsService.removeHabit(habit.id);
+                      _fetchHabits(); // Refresh habit list
+                      setState(() {}); // Rebuild UI
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${habit.title} deleted'),
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error deleting habit: $e'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  },
+                );
               },
-            );
-          },
-        ),
-      ),
-      floatingActionButton: Stack(
-        children: [
-          Align(
-            alignment: Alignment.bottomRight,
-            child: FloatingActionButton(
-              onPressed: _showFilterDialog,
-              backgroundColor: Colors.orange,
-              child: Icon(Icons.filter_list),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 70.0),
-            child: Align(
-              alignment: Alignment.bottomRight,
-              child: FloatingActionButton(
-                backgroundColor: Colors.orange,
-                onPressed: _addHabit,
-                child: Icon(Icons.add),
+          );
+        }
+
+        return Scaffold(
+          body: body,
+          floatingActionButton: Stack(
+            children: [
+              Align(
+                alignment: Alignment.bottomRight,
+                child: FloatingActionButton(
+                  onPressed: _showFilterDialog,
+                  backgroundColor: Colors.orange,
+                  child: Icon(Icons.filter_list),
+                ),
               ),
-            ),
+              Padding(
+                padding: const EdgeInsets.only(right: 70.0),
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: FloatingActionButton(
+                    backgroundColor: Colors.orange,
+                    onPressed: _addHabit,
+                    child: Icon(Icons.add),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

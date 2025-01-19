@@ -148,7 +148,6 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
               email: emailController.text,
               password: passwordController.text,
               photoUrl: avatarUrlController.text,
-              habitIds: widget.user.habitIds,
             );
             userService.updateUser(updatedUser);
             widget.onSave(updatedUser);

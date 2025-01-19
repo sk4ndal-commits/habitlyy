@@ -10,33 +10,35 @@ class HabitsService implements IHabitsService {
 
   HabitsService(this._repository, this._userService);
 
-  void addHabit(TimeInvestmentHabitViewModel habit) {
-    _repository.addHabit(habit);
+  Future<void> addHabit(TimeInvestmentHabitViewModel habit) async {
+    await _repository.addHabit(habit);
   }
 
-  void removeHabit(int habitId) {
-    _repository.deleteHabit(habitId);
+  Future<void> removeHabit(int habitId) async {
+    await _repository.deleteHabit(habitId);
   }
 
-  List<TimeInvestmentHabitViewModel> getHabits() {
-    return _repository.getHabits();
+  Future<List<TimeInvestmentHabitViewModel>> getHabits() async {
+    return await _repository.getHabits();
   }
 
-  List<TimeInvestmentHabitViewModel> getTodayHabits() {
+  Future<List<TimeInvestmentHabitViewModel>> getTodayHabits() async {
     final currentUser = _userService.getCurrentUser();
     if (currentUser == null) {
       return [];
     }
 
     final today = getFrequencyDay(DateTime.now().weekday);
-    return _repository
-        .getHabitsByUserId(currentUser.id)
+    final habitsByUser = await _repository.getHabitsByUserId(currentUser.id);
+
+    return habitsByUser
         .where((habit) => habit.frequencyDays?.contains(today) ?? false)
         .toList();
   }
 
-  List<TimeInvestmentHabitViewModel> getHabitsByUserId(int userId) {
-    return _repository.getHabitsByUserId(userId);
+  Future<List<TimeInvestmentHabitViewModel>> getHabitsByUserId(
+      int userId) async {
+    return await _repository.getHabitsByUserId(userId);
   }
 
   FrequencyDay getFrequencyDay(int weekday) {

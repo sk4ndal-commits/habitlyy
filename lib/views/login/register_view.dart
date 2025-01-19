@@ -60,7 +60,6 @@ class RegisterView extends StatelessWidget {
                   email: email,
                   password: password,
                   photoUrl: '',
-                  habitIds: [],
                 );
 
                 userService.addUser(newUser);

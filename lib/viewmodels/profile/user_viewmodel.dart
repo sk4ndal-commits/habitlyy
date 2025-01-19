@@ -5,7 +5,6 @@ class UserViewModel {
   String email;
   String password;
   String? photoUrl;
-  List<int> habitIds;
 
   UserViewModel({
     required this.id,
@@ -13,6 +12,5 @@ class UserViewModel {
     required this.email,
     required this.password,
     required this.photoUrl,
-    required this.habitIds,
   });
 }

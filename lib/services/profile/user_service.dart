@@ -9,31 +9,31 @@ class UserService implements IUserService {
 
   UserService(this._userRepository);
 
-  void addUser(UserViewModel user) {
-    _userRepository.addUser(user);
+  Future<void> addUser(UserViewModel user) async {
+    await _userRepository.addUser(user);
   }
 
-  void updateUser(UserViewModel updatedUser) {
-    _userRepository.updateUser(updatedUser);
+  Future<void> updateUser(UserViewModel updatedUser) async {
+    await _userRepository.updateUser(updatedUser);
     if (_currentUser != null && _currentUser!.id == updatedUser.id) {
       _currentUser = updatedUser;
     }
   }
 
-  void deleteUser(int userId) {
-    _userRepository.deleteUser(userId);
+  Future<void> deleteUser(int userId) async {
+    await _userRepository.deleteUser(userId);
   }
 
   UserViewModel? getCurrentUser() {
     return _currentUser;
   }
 
-  UserViewModel? getUserById(int userId) {
-    return _userRepository.getUserById(userId);
+  Future<UserViewModel?> getUserById(int userId) async {
+    return await _userRepository.getUserById(userId);
   }
 
-  UserViewModel? login(String email, String password) {
-    final user = _userRepository.getUserByEmailAndPassword(email, password);
+  Future<UserViewModel?> login(String email, String password) async {
+    final user = await _userRepository.getUserByEmailAndPassword(email, password);
     if (user == null) {
       return null;
     }
