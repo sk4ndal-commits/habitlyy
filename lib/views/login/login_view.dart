@@ -15,6 +15,13 @@ class LoginView extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed('/showcase');
+              },
+              child: Text('See what the app offers'),
+            ),
+            SizedBox(height: 16.0),
             TextField(
               controller: emailController,
               decoration: InputDecoration(labelText: 'Email'),
@@ -46,7 +53,7 @@ class LoginView extends StatelessWidget {
                 Navigator.of(context).pushNamed('/register');
               },
               child: Text('Register'),
-            )
+            ),
           ],
         ),
       ),
