@@ -140,6 +140,7 @@ class _DashboardListItemViewState extends State<DashboardListItemView> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _buildTimerButtons(setState, startTimer, stopTimer),
+                    SizedBox(height: 4.0),
                     Text('Timer: ${formatTime(seconds)}'),
                     SizedBox(height: 16.0),
                     _buildInvestedHoursField(investedHoursController),
@@ -195,7 +196,6 @@ class _DashboardListItemViewState extends State<DashboardListItemView> {
     return [
       TextButton(
         child: Text('Cancel'),
-        style: TextButton.styleFrom(foregroundColor: Colors.green),
         onPressed: () {
           stopTimer();
           Navigator.of(context).pop();
@@ -203,7 +203,6 @@ class _DashboardListItemViewState extends State<DashboardListItemView> {
       ),
       TextButton(
         child: Text('Save'),
-        style: TextButton.styleFrom(foregroundColor: Colors.green),
         onPressed: () {
           if (_formKey.currentState!.validate()) {
             final newInvestedHours = double.tryParse(controller.text);

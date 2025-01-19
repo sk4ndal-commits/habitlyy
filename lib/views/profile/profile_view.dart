@@ -3,28 +3,114 @@ import 'package:habitlyy/service_locator.dart';
 import 'package:habitlyy/services/profile/iuser_service.dart';
 import 'package:habitlyy/viewmodels/profile/user_viewmodel.dart';
 
-class ProfileView extends StatelessWidget {
+class ProfileView extends StatefulWidget {
+  @override
+  _ProfileViewState createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends State<ProfileView> {
+  late Future<UserViewModel?> userFuture = _fetchUser();
+
+  Future<UserViewModel?> _fetchUser() async {
+    final userService = getIt<IUserService>();
+    return userService.getCurrentUser();
+  }
+
+  void updateUser(UserViewModel updatedUser) {
+    setState(() {
+      userFuture = Future.value(updatedUser);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: FutureBuilder<UserViewModel?>(
+        future: userFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data == null) {
+            return Center(child: Text('User not found'));
+          }
+
+          final user = snapshot.data!;
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  radius: 50,
+                  backgroundImage: NetworkImage(user.photoUrl ?? ''),
+                ),
+                SizedBox(height: 16.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      user.name,
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => EditProfileDialog(
+                            user: user,
+                            onSave: updateUser,
+                          ),
+                        );
+                      },
+                      icon: Icon(Icons.edit),
+                      tooltip: 'Edit',
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class EditProfileDialog extends StatefulWidget {
+  final UserViewModel user;
+  final Function(UserViewModel) onSave;
+
+  EditProfileDialog({required this.user, required this.onSave});
+
+  @override
+  _EditProfileDialogState createState() => _EditProfileDialogState();
+}
+
+class _EditProfileDialogState extends State<EditProfileDialog> {
+  late TextEditingController nameController;
+  late TextEditingController emailController;
+  late TextEditingController avatarUrlController;
+  late TextEditingController passwordController;
+
+  @override
+  void initState() {
+    super.initState();
+    nameController = TextEditingController(text: widget.user.name);
+    emailController = TextEditingController(text: widget.user.email);
+    avatarUrlController = TextEditingController(text: widget.user.photoUrl);
+    passwordController = TextEditingController(text: widget.user.password);
+  }
+
   @override
   Widget build(BuildContext context) {
     final userService = getIt<IUserService>();
-    final user = userService.getCurrentUser();
 
-    if (user == null) {
-      return Scaffold(
-        appBar: AppBar(title: Text('Profile')),
-        body: Center(child: Text('User not found')),
-      );
-    }
-
-    final nameController = TextEditingController(text: user.name);
-    final emailController = TextEditingController(text: user.email);
-    final avatarUrlController = TextEditingController(text: user.photoUrl);
-    final passwordController = TextEditingController(text: user.password);
-
-    return Scaffold(
-      appBar: AppBar(title: Text('Profile')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+    return AlertDialog(
+      title: Text('Edit Profile'),
+      content: SingleChildScrollView(
         child: Column(
           children: [
             TextField(
@@ -37,31 +123,40 @@ class ProfileView extends StatelessWidget {
             ),
             TextField(
               controller: avatarUrlController,
-              decoration: InputDecoration(labelText: 'Avatar URL'),
+              decoration: InputDecoration(labelText: 'Photo URL'),
             ),
             TextField(
               controller: passwordController,
               decoration: InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
-            SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: () {
-                userService.updateUser(UserViewModel(
-                  id: user.id,
-                  name: nameController.text,
-                  email: emailController.text,
-                  password: passwordController.text,
-                  photoUrl: avatarUrlController.text,
-                  habitIds: user.habitIds,
-                ));
-                Navigator.of(context).pop();
-              },
-              child: Text('Save'),
-            ),
           ],
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            final updatedUser = UserViewModel(
+              id: widget.user.id,
+              name: nameController.text,
+              email: emailController.text,
+              password: passwordController.text,
+              photoUrl: avatarUrlController.text,
+              habitIds: widget.user.habitIds,
+            );
+            userService.updateUser(updatedUser);
+            widget.onSave(updatedUser);
+            Navigator.of(context).pop();
+          },
+          child: Text('Save'),
+        ),
+      ],
     );
   }
 }

@@ -15,6 +15,9 @@ class UserService implements IUserService {
 
   void updateUser(UserViewModel updatedUser) {
     _userRepository.updateUser(updatedUser);
+    if (_currentUser != null && _currentUser!.id == updatedUser.id) {
+      _currentUser = updatedUser;
+    }
   }
 
   void deleteUser(int userId) {
@@ -31,9 +34,10 @@ class UserService implements IUserService {
 
   UserViewModel? login(String email, String password) {
     final user = _userRepository.getUserByEmailAndPassword(email, password);
-    if (user != null) {
-      _currentUser = user;
+    if (user == null) {
+      return null;
     }
+    _currentUser = user;
     return user;
   }
 

@@ -31,6 +31,14 @@ void main() {
     });
 
     test('updates a user', () {
+      final user = UserViewModel(
+          id: 1,
+          name: 'Test User',
+          email: 'test@example.com',
+          password: 'password',
+          photoUrl: 'http://example.com/photo.jpg',
+          habitIds: []);
+
       final updatedUser = UserViewModel(
           id: 1,
           name: 'Updated User',
@@ -39,9 +47,17 @@ void main() {
           photoUrl: 'http://example.com/photo.jpg',
           habitIds: []);
 
+      userService.addUser(user);
+      when(mockUserRepository.getUserByEmailAndPassword(user.email, user.password))
+          .thenReturn(user);
+      userService.login(user.email, user.password);
+
+      // Update the user
       userService.updateUser(updatedUser);
 
       verify(mockUserRepository.updateUser(updatedUser)).called(1);
+      final currentUser = userService.getCurrentUser();
+      expect(currentUser, updatedUser);
     });
 
     test('deletes a user', () {

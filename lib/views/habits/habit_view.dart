@@ -331,14 +331,12 @@ class _HabitViewState extends State<HabitView> {
     return [
       TextButton(
         child: Text('Cancel'),
-        style: TextButton.styleFrom(foregroundColor: Colors.green),
         onPressed: () {
           Navigator.of(context).pop();
         },
       ),
       TextButton(
         child: Text('Save'),
-        style: TextButton.styleFrom(foregroundColor: Colors.green),
         onPressed: () {
           setState(() {
             // Update the habit details
@@ -376,14 +374,12 @@ class _HabitViewState extends State<HabitView> {
           actions: <Widget>[
             TextButton(
               child: Text('No'),
-              style: TextButton.styleFrom(foregroundColor: Colors.green),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
               child: Text('Yes'),
-              style: TextButton.styleFrom(foregroundColor: Colors.green),
               onPressed: () {
                 widget.onDelete();
                 Navigator.of(context).pop();

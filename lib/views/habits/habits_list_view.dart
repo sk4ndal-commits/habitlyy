@@ -207,14 +207,12 @@ class _HabitsViewState extends State<HabitsView> {
     return [
       TextButton(
         child: Text('Cancel'),
-        style: TextButton.styleFrom(foregroundColor: Colors.green),
         onPressed: () {
           Navigator.of(context).pop();
         },
       ),
       TextButton(
         child: Text('Add'),
-        style: TextButton.styleFrom(foregroundColor: Colors.green),
         onPressed: () {
           if (_formKey.currentState!.validate()) {
             final newHabit = TimeInvestmentHabitViewModel(
@@ -322,7 +320,6 @@ class _HabitsViewState extends State<HabitsView> {
     return [
       TextButton(
         child: Text('Clear'),
-        style: TextButton.styleFrom(foregroundColor: Colors.green),
         onPressed: () {
           setState(() {
             _selectedPriority = null;
@@ -334,7 +331,6 @@ class _HabitsViewState extends State<HabitsView> {
       ),
       TextButton(
         child: Text('Apply'),
-        style: TextButton.styleFrom(foregroundColor: Colors.green),
         onPressed: () {
           setState(() {
             _selectedPriority = tempSelectedPriority;
