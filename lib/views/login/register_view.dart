@@ -62,7 +62,7 @@ class RegisterView extends StatelessWidget {
                   photoUrl: '',
                 );
 
-                userService.addUser(newUser);
+                userService.addUserAsync(newUser);
                 Navigator.of(context).pushReplacementNamed('/login');
               },
               child: Text('Register'),

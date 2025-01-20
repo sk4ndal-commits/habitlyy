@@ -12,7 +12,7 @@ class HabitsDBRepository implements IHabitsRepository {
 
   // Add a new habit to the database
   @override
-  Future<void> addHabit(TimeInvestmentHabitViewModel habit) async {
+  Future<void> addHabitAsync(TimeInvestmentHabitViewModel habit) async {
     await _database.insert(
       'habits',
       {
@@ -29,7 +29,7 @@ class HabitsDBRepository implements IHabitsRepository {
   }
 
   @override
-  Future<void> updateHabit(TimeInvestmentHabitViewModel habit) async {
+  Future<void> updateHabitAsync(TimeInvestmentHabitViewModel habit) async {
     await _database.update(
       'habits',
       {
@@ -50,7 +50,7 @@ class HabitsDBRepository implements IHabitsRepository {
 
   // Delete a habit by its ID
   @override
-  Future<void> deleteHabit(int habitId) async {
+  Future<void> deleteHabitAsync(int habitId) async {
     await _database.delete(
       'habits',
       where: 'id = ?',
@@ -60,14 +60,14 @@ class HabitsDBRepository implements IHabitsRepository {
 
   // Get all habits from the database
   @override
-  Future<List<TimeInvestmentHabitViewModel>> getHabits() async {
+  Future<List<TimeInvestmentHabitViewModel>> getHabitsAsync() async {
     final rows = await _database.query('habits');
     return rows.map((row) => _mapRowToHabit(row)).toList();
   }
 
   // Get habits for a specific user by their user ID
   @override
-  Future<List<TimeInvestmentHabitViewModel>> getHabitsByUserId(
+  Future<List<TimeInvestmentHabitViewModel>> getHabitsByUserIdAsync(
       int userId) async {
     final rows = await _database.query(
       'habits',

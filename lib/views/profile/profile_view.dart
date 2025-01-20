@@ -13,7 +13,7 @@ class _ProfileViewState extends State<ProfileView> {
 
   Future<UserViewModel?> _fetchUser() async {
     final userService = getIt<IUserService>();
-    return userService.getCurrentUser();
+    return userService.getCurrentUserAsync();
   }
 
   void updateUser(UserViewModel updatedUser) {
@@ -149,7 +149,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
               password: passwordController.text,
               photoUrl: avatarUrlController.text,
             );
-            userService.updateUser(updatedUser);
+            userService.updateUserAsync(updatedUser);
             widget.onSave(updatedUser);
             Navigator.of(context).pop();
           },

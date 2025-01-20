@@ -37,7 +37,7 @@ class LoginView extends StatelessWidget {
                 final email = emailController.text;
                 final password = passwordController.text;
                 final userService = getIt<IUserService>();
-                final user = userService.login(email, password);
+                final user = userService.loginAsync(email, password);
                 if (user != null) {
                   Navigator.of(context).pushReplacementNamed('/home');
                 } else {

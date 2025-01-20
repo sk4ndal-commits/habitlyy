@@ -9,7 +9,7 @@ class UserDBRepository implements IUserRepository {
 
 
   @override
-  Future<void> addUser(UserViewModel user) async {
+  Future<void> addUserAsync(UserViewModel user) async {
 
     await _database.insert(
       'users',
@@ -25,7 +25,7 @@ class UserDBRepository implements IUserRepository {
   }
 
   @override
-  Future<void> updateUser(UserViewModel user) async {
+  Future<void> updateUserAsync(UserViewModel user) async {
 
     await _database.update(
       'users',
@@ -41,7 +41,7 @@ class UserDBRepository implements IUserRepository {
   }
 
   @override
-  Future<void> deleteUser(int userId) async {
+  Future<void> deleteUserAsync(int userId) async {
 
     await _database.delete(
       'users',
@@ -51,7 +51,7 @@ class UserDBRepository implements IUserRepository {
   }
 
   @override
-  Future<UserViewModel?> getUserById(int userId) async {
+  Future<UserViewModel?> getUserByIdAsync(int userId) async {
 
     final result = await _database.query(
       'users',
@@ -73,7 +73,7 @@ class UserDBRepository implements IUserRepository {
   }
 
   @override
-  Future<UserViewModel?> getUserByEmailAndPassword(
+  Future<UserViewModel?> getUserByEmailAndPasswordAsync(
       String email, String password) async {
 
     final result = await _database.query(
@@ -96,7 +96,7 @@ class UserDBRepository implements IUserRepository {
   }
 
   @override
-  Future<List<UserViewModel>> getAllUsers() async {
+  Future<List<UserViewModel>> getAllUsersAsync() async {
 
     final result = await _database.query('users');
 

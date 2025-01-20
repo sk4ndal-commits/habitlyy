@@ -1,8 +1,5 @@
 import 'package:get_it/get_it.dart';
-import 'package:habitlyy/database/db_config.dart';
 import 'package:habitlyy/database/db_helper.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:habitlyy/repositories/habits/habits_db_repository.dart';
 import 'package:habitlyy/repositories/habits/habits_repository.dart';
 import 'package:habitlyy/repositories/profile/iuser_repository.dart';

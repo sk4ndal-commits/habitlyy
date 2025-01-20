@@ -51,7 +51,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     final userService = getIt<IUserService>();
 
     try {
-      final currentUser = userService.getCurrentUser();
+      final currentUser = userService.getCurrentUserAsync();
       return MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => HabitsProvider()),

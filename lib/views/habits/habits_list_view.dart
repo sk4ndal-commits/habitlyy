@@ -31,7 +31,7 @@ class _HabitListViewState extends State<HabitListView> {
   }
 
   void _fetchHabits() {
-    final currentUser = userService.getCurrentUser();
+    final currentUser = userService.getCurrentUserAsync();
     if (currentUser != null) {
       _habitsFuture = habitsService.getHabitsByUserIdAsync(currentUser.id);
     }
@@ -236,7 +236,7 @@ class _HabitListViewState extends State<HabitListView> {
               deadline: DateTime.parse(deadlineController.text),
               targetHours: double.parse(targetHoursController.text),
               frequencyDays: selectedFrequencyDays,
-              userId: userService.getCurrentUser()!.id,
+              userId: userService.getCurrentUserAsync()!.id,
             );
 
             try {
@@ -368,7 +368,7 @@ class _HabitListViewState extends State<HabitListView> {
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = userService.getCurrentUser();
+    final currentUser = userService.getCurrentUserAsync();
 
     if (currentUser == null) {
       return Center(child: Text("No logged-in user")); // Handle no user case
