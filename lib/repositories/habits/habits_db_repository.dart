@@ -21,11 +21,30 @@ class HabitsDBRepository implements IHabitsRepository {
         'startDate': habit.startDate.toIso8601String(),
         'deadline': habit.deadline.toIso8601String(),
         'targetHours': habit.targetHours,
+        'frequencyDays':
+            habit.frequencyDays != null ? habit.frequencyDays.toString() : null,
+        'userId': habit.userId,
+      },
+    );
+  }
+
+  @override
+  Future<void> updateHabit(TimeInvestmentHabitViewModel habit) async {
+    await _database.update(
+      'habits',
+      {
+        'title': habit.title,
+        'priority': habit.priority.toString(),
+        'startDate': habit.startDate.toIso8601String(),
+        'deadline': habit.deadline.toIso8601String(),
+        'targetHours': habit.targetHours,
         'frequencyDays': habit.frequencyDays != null
-            ? habit.frequencyDays.toString()
+            ? habit.frequencyDays?.map((e) => e.toString()).join(",")
             : null,
         'userId': habit.userId,
       },
+      where: 'id = ?',
+      whereArgs: [habit.id],
     );
   }
 
@@ -48,7 +67,8 @@ class HabitsDBRepository implements IHabitsRepository {
 
   // Get habits for a specific user by their user ID
   @override
-  Future<List<TimeInvestmentHabitViewModel>> getHabitsByUserId(int userId) async {
+  Future<List<TimeInvestmentHabitViewModel>> getHabitsByUserId(
+      int userId) async {
     final rows = await _database.query(
       'habits',
       where: 'userId = ?',
@@ -76,7 +96,7 @@ class HabitsDBRepository implements IHabitsRepository {
   // Parse habit priority from string to enum
   HabitPriority _parsePriority(String value) {
     return HabitPriority.values.firstWhere(
-          (priority) => priority.toString() == value,
+      (priority) => priority.toString() == value,
       orElse: () => HabitPriority.LOW, // Fallback
     );
   }
@@ -86,9 +106,9 @@ class HabitsDBRepository implements IHabitsRepository {
     return value
         .split(',')
         .map((day) => FrequencyDay.values.firstWhere(
-          (freqDay) => freqDay.toString() == day.trim(),
-      orElse: () => FrequencyDay.MONDAY,
-    ))
+              (freqDay) => freqDay.toString() == day.trim(),
+              orElse: () => FrequencyDay.MONDAY,
+            ))
         .toList();
   }
 }

@@ -19,9 +19,10 @@ class _DashboardGraphViewState extends State<DashboardGraphView> {
   }
 
   // Fetch today's habits asynchronously
-  void _loadData() {
+  void _loadData() async {
     final habitsService = getIt<IHabitsService>();
-    _todayHabitsFuture = habitsService.getTodayHabits(); // Assume this is async
+    _todayHabitsFuture = habitsService.getTodayHabitsAsync();
+    await _todayHabitsFuture;
   }
 
   @override

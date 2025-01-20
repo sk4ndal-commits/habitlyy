@@ -8,14 +8,14 @@ import '../../viewmodels/habits/habit_viewmodel.dart';
 import 'habit_view.dart';
 
 /// A stateful widget that displays a list of habits.
-class HabitsView extends StatefulWidget {
-  const HabitsView({super.key});
+class HabitListView extends StatefulWidget {
+  const HabitListView({super.key});
 
   @override
-  _HabitsViewState createState() => _HabitsViewState();
+  _HabitListViewState createState() => _HabitListViewState();
 }
 
-class _HabitsViewState extends State<HabitsView> {
+class _HabitListViewState extends State<HabitListView> {
   final habitsService = getIt<IHabitsService>();
   final userService = getIt<IUserService>();
   late Future<List<TimeInvestmentHabitViewModel>> _habitsFuture;
@@ -33,7 +33,7 @@ class _HabitsViewState extends State<HabitsView> {
   void _fetchHabits() {
     final currentUser = userService.getCurrentUser();
     if (currentUser != null) {
-      _habitsFuture = habitsService.getHabitsByUserId(currentUser.id);
+      _habitsFuture = habitsService.getHabitsByUserIdAsync(currentUser.id);
     }
   }
 
@@ -240,7 +240,7 @@ class _HabitsViewState extends State<HabitsView> {
             );
 
             try {
-              await habitsService.addHabit(newHabit); // Await adding habit
+              await habitsService.addHabitAsync(newHabit); // Await adding habit
               _fetchHabits(); // Refresh habit list
               setState(() {}); // Rebuild UI
               Navigator.of(context).pop(); // Close dialog
@@ -411,7 +411,7 @@ class _HabitsViewState extends State<HabitsView> {
                   habit: habit,
                   onDelete: () async {
                     try {
-                      await habitsService.removeHabit(habit.id);
+                      await habitsService.deleteHabitAsync(habit.id);
                       _fetchHabits(); // Refresh habit list
                       setState(() {}); // Rebuild UI
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -429,6 +429,7 @@ class _HabitsViewState extends State<HabitsView> {
                       );
                     }
                   },
+                  service: habitsService,
                 );
               },
             ),

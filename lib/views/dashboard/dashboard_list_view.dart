@@ -19,9 +19,10 @@ class _DashboardListViewState extends State<DashboardListView> {
   }
 
   // Fetch today's habits asynchronously
-  void _fetchTodayHabits() {
+  Future<void> _fetchTodayHabits() async {
     final habitsService = getIt<IHabitsService>();
-    _todayHabitsFuture = habitsService.getTodayHabits(); // Assume this is a Future
+    _todayHabitsFuture = habitsService.getTodayHabitsAsync();
+    await _todayHabitsFuture;
   }
 
   // Filters and sorts the habits (not async since we already fetched the data)
@@ -42,10 +43,10 @@ class _DashboardListViewState extends State<DashboardListView> {
         final habit = habits[index];
         return DashboardListItemView(
           habit: habit,
-          onHabitUpdated: () {
+          onHabitUpdated: (updateHabit) {
             // Refresh habits when updated
             setState(() {
-              _fetchTodayHabits();
+              habits[index] = updateHabit;
             });
           },
         );

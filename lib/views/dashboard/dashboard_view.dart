@@ -14,7 +14,10 @@ class DashboardView extends StatelessWidget {
           SizedBox(height: 32.0),
           _buildSectionTitle(context, "Today's Tasks"),
           SizedBox(height: 16.0),
-          DashboardListView(),
+          // Wrap the DashboardListView in Expanded
+          Expanded(
+            child: DashboardListView(),
+          ),
           SizedBox(height: 16.0),
         ],
       ),

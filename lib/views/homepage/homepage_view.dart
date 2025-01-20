@@ -17,7 +17,7 @@ class _HomePageViewState extends State<HomePageView> {
 
   static final List<Widget> _widgetOptions = <Widget>[
     DashboardView(),
-    HabitsView(),
+    HabitListView(),
     ProfileView(),
   ];
 

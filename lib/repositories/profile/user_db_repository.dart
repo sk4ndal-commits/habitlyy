@@ -20,7 +20,7 @@ class UserDBRepository implements IUserRepository {
         'password': user.password,
         'photoUrl': user.photoUrl,
       },
-      conflictAlgorithm: ConflictAlgorithm.replace,
+      conflictAlgorithm: ConflictAlgorithm.rollback,
     );
   }
 

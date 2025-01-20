@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:habitlyy/database/db_config.dart';
+import 'package:habitlyy/database/db_helper.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:habitlyy/repositories/habits/habits_db_repository.dart';
@@ -14,7 +15,8 @@ import 'package:habitlyy/services/profile/user_service.dart';
 final GetIt getIt = GetIt.instance;
 
 Future<void> setupLocator() async {
-  final database = await initializeDatabase();
+  final dbHelper = DatabaseHelper();
+  final database = await dbHelper.database;
 
   getIt.registerLazySingleton<IHabitsRepository>(
       () => HabitsDBRepository(database));
@@ -26,42 +28,5 @@ Future<void> setupLocator() async {
   );
   getIt.registerLazySingleton<IHabitsService>(
     () => HabitsService(getIt<IHabitsRepository>(), getIt<IUserService>()),
-  );
-}
-
-Future<Database> initializeDatabase() async {
-  final dbPath = await getDatabasesPath();
-  final path = join(dbPath, DBConfig().DBName);
-
-  return await openDatabase(
-    path,
-    version: 1,
-    onCreate: (db, version) async {
-      // Create the users table
-      await db.execute('''
-        CREATE TABLE users (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name TEXT,
-          email TEXT UNIQUE,
-          password TEXT,
-          photoUrl TEXT
-        )
-      ''');
-
-      // Create the habits table
-      await db.execute('''
-        CREATE TABLE habits (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          title TEXT,
-          priority TEXT,
-          startDate TEXT,
-          deadline TEXT,
-          targetHours REAL,
-          frequencyDays TEXT,
-          userId INTEGER,
-          FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE
-        )
-      ''');
-    },
   );
 }

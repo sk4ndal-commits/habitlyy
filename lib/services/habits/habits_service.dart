@@ -10,19 +10,28 @@ class HabitsService implements IHabitsService {
 
   HabitsService(this._repository, this._userService);
 
-  Future<void> addHabit(TimeInvestmentHabitViewModel habit) async {
+  @override
+  Future<void> addHabitAsync(TimeInvestmentHabitViewModel habit) async {
     await _repository.addHabit(habit);
   }
 
-  Future<void> removeHabit(int habitId) async {
+  @override
+  Future<void> updateHabitAsync(TimeInvestmentHabitViewModel habit) {
+    return _repository.updateHabit(habit);
+  }
+
+  @override
+  Future<void> deleteHabitAsync(int habitId) async {
     await _repository.deleteHabit(habitId);
   }
 
-  Future<List<TimeInvestmentHabitViewModel>> getHabits() async {
+  @override
+  Future<List<TimeInvestmentHabitViewModel>> getHabitsAsync() async {
     return await _repository.getHabits();
   }
 
-  Future<List<TimeInvestmentHabitViewModel>> getTodayHabits() async {
+  @override
+  Future<List<TimeInvestmentHabitViewModel>> getTodayHabitsAsync() async {
     final currentUser = _userService.getCurrentUser();
     if (currentUser == null) {
       return [];
@@ -31,16 +40,20 @@ class HabitsService implements IHabitsService {
     final today = getFrequencyDay(DateTime.now().weekday);
     final habitsByUser = await _repository.getHabitsByUserId(currentUser.id);
 
-    return habitsByUser
+    final habits = habitsByUser
         .where((habit) => habit.frequencyDays?.contains(today) ?? false)
         .toList();
+
+    return habits;
   }
 
-  Future<List<TimeInvestmentHabitViewModel>> getHabitsByUserId(
+  @override
+  Future<List<TimeInvestmentHabitViewModel>> getHabitsByUserIdAsync(
       int userId) async {
     return await _repository.getHabitsByUserId(userId);
   }
 
+  @override
   FrequencyDay getFrequencyDay(int weekday) {
     const days = [
       FrequencyDay.MONDAY,
@@ -53,4 +66,5 @@ class HabitsService implements IHabitsService {
     ];
     return days[(weekday - 1) % 7];
   }
+
 }

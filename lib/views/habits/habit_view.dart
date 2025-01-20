@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 
 import '../../enums/frequency_days.dart';
 import '../../enums/habit_priority.dart';
+import '../../services/habits/ihabits_service.dart';
 import '../../viewmodels/habits/habit_viewmodel.dart';
 
 class HabitView extends StatefulWidget {
   final TimeInvestmentHabitViewModel habit;
   final VoidCallback onDelete;
+  final IHabitsService service;
 
   const HabitView({
     Key? key,
     required this.habit,
     required this.onDelete,
+    required this.service
   }) : super(key: key);
 
   @override
@@ -337,7 +340,7 @@ class _HabitViewState extends State<HabitView> {
       ),
       TextButton(
         child: Text('Save'),
-        onPressed: () {
+        onPressed: () async {
           setState(() {
             // Update the habit details
             widget.habit.priority = _selectedPriority;
@@ -348,6 +351,8 @@ class _HabitViewState extends State<HabitView> {
               widget.habit.frequencyDays = selectedFrequencyDays;
             }
           });
+
+          await widget.service.updateHabitAsync(widget.habit);
 
           // Close the dialog
           Navigator.of(context).pop();
@@ -380,9 +385,13 @@ class _HabitViewState extends State<HabitView> {
             ),
             TextButton(
               child: Text('Yes'),
-              onPressed: () {
+              onPressed: () async {
+                await widget.service.deleteHabitAsync(widget.habit.id);
+
                 widget.onDelete();
+
                 Navigator.of(context).pop();
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('${widget.habit.title} deleted'),

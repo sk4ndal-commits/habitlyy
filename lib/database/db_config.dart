@@ -1,3 +1,3 @@
 class DBConfig {
-  String get DBName => "habitlyy.sqlite";
+  String get DBName => "habitlyy.db";
 }
