@@ -65,7 +65,7 @@ class _ProfileViewState extends State<ProfileView> {
                           ),
                         );
                       },
-                      icon: Icon(Icons.edit),
+                      icon: Icon(Icons.edit, color: Colors.green,),
                       tooltip: 'Edit',
                     ),
                   ],
@@ -134,11 +134,11 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
         ),
       ),
       actions: [
-        TextButton(
+        ElevatedButton(
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: Text('Cancel'),
+          child: Text('Cancel', style: TextStyle(color: Colors.orange),),
         ),
         ElevatedButton(
           onPressed: () {
@@ -153,7 +153,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
             widget.onSave(updatedUser);
             Navigator.of(context).pop();
           },
-          child: Text('Save'),
+          child: Text('Save', style: TextStyle(color: Colors.green),),
         ),
       ],
     );

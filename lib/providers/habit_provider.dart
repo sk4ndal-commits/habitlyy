@@ -17,20 +17,20 @@ class HabitsProvider with ChangeNotifier {
   HabitsProvider(this._habitsService);
 
   /// Load habits for the logged-in user from the backend
-  Future<void> loadHabits(int userId) async {
+  Future<void> loadHabitsAsync(int userId) async {
     _todayHabits = await _habitsService.getHabitsByUserIdAsync(userId);
     notifyListeners(); // Notify listeners that habits are loaded
   }
 
   /// Add a new habit
-  Future<void> addHabit(TimeInvestmentHabitViewModel habit) async {
+  Future<void> addHabitAsync(TimeInvestmentHabitViewModel habit) async {
     await _habitsService.addHabitAsync(habit); // Save habit via service
     _todayHabits.add(habit); // Add habit to the in-memory list
     notifyListeners(); // Notify listeners about the addition
   }
 
   /// Update an existing habit
-  Future<void> updateHabit(TimeInvestmentHabitViewModel updatedHabit) async {
+  Future<void> updateHabitAsync(TimeInvestmentHabitViewModel updatedHabit) async {
     await _habitsService
         .updateHabitAsync(updatedHabit); // Update habit via service
     final index = _todayHabits.indexWhere((h) => h.id == updatedHabit.id);
@@ -41,7 +41,7 @@ class HabitsProvider with ChangeNotifier {
   }
 
   /// Delete a habit by its ID
-  Future<void> deleteHabit(int habitId) async {
+  Future<void> deleteHabitAsync(int habitId) async {
     await _habitsService.deleteHabitAsync(habitId); // Remove habit via service
     _todayHabits.removeWhere((habit) => habit.id == habitId); // Update state
     notifyListeners(); // Notify listeners about the deletion

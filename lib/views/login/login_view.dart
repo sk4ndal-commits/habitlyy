@@ -12,7 +12,6 @@ class LoginView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Login')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -21,7 +20,10 @@ class LoginView extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pushNamed('/showcase');
               },
-              child: Text('See what the app offers'),
+              child: Text(
+                'See what the app offers',
+                style: TextStyle(color: Colors.green),
+              ),
             ),
             SizedBox(height: 16.0),
             TextField(
@@ -52,13 +54,13 @@ class LoginView extends StatelessWidget {
                   );
                 }
               },
-              child: Text('Login'),
+              child: Text('Login', style: TextStyle(color: Colors.green),),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pushNamed('/register');
               },
-              child: Text('Register'),
+              child: Text('Register', style: TextStyle(color: Colors.orange),),
             ),
           ],
         ),

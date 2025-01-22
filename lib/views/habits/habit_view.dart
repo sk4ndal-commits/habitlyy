@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:habitlyy/providers/habit_provider.dart';
 
 import '../../enums/frequency_days.dart';
 import '../../enums/habit_priority.dart';
-import '../../services/habits/ihabits_service.dart';
 import '../../viewmodels/habits/habit_viewmodel.dart';
 
 class HabitView extends StatefulWidget {
   final TimeInvestmentHabitViewModel habit;
   final VoidCallback onDelete;
-  final IHabitsService service;
+  final HabitsProvider habitsProvider;
 
   const HabitView({
     Key? key,
     required this.habit,
     required this.onDelete,
-    required this.service
+    required this.habitsProvider
   }) : super(key: key);
 
   @override
@@ -162,7 +162,7 @@ class _HabitViewState extends State<HabitView> {
 
   Widget _buildEditButton(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.edit, color: Colors.grey),
+      icon: Icon(Icons.edit, color: Colors.green),
       onPressed: () {
         _showEditDialog(context);
       },
@@ -171,7 +171,7 @@ class _HabitViewState extends State<HabitView> {
 
   Widget _buildDeleteButton(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.delete, color: Colors.grey),
+      icon: Icon(Icons.delete, color: Colors.orange),
       onPressed: () {
         _showDeleteDialog(context);
       },
@@ -332,14 +332,14 @@ class _HabitViewState extends State<HabitView> {
     List<FrequencyDay> selectedFrequencyDays,
   ) {
     return [
-      TextButton(
-        child: Text('Cancel'),
+      ElevatedButton(
+        child: Text('Cancel', style: TextStyle(color: Colors.orange),),
         onPressed: () {
           Navigator.of(context).pop();
         },
       ),
-      TextButton(
-        child: Text('Save'),
+      ElevatedButton(
+        child: Text('Save', style: TextStyle(color: Colors.green),),
         onPressed: () async {
           setState(() {
             // Update the habit details
@@ -352,7 +352,7 @@ class _HabitViewState extends State<HabitView> {
             }
           });
 
-          await widget.service.updateHabitAsync(widget.habit);
+          await widget.habitsProvider.updateHabitAsync(widget.habit);
 
           // Close the dialog
           Navigator.of(context).pop();
@@ -377,16 +377,16 @@ class _HabitViewState extends State<HabitView> {
           title: Text(widget.habit.title),
           content: Text('Do you really want to delete this habit?'),
           actions: <Widget>[
-            TextButton(
-              child: Text('No'),
+            ElevatedButton(
+              child: Text('No', style: TextStyle(color: Colors.orange),),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
-            TextButton(
-              child: Text('Yes'),
+            ElevatedButton(
+              child: Text('Yes', style: TextStyle(color: Colors.green),),
               onPressed: () async {
-                await widget.service.deleteHabitAsync(widget.habit.id);
+                await widget.habitsProvider.deleteHabitAsync(widget.habit.id);
 
                 widget.onDelete();
 

@@ -22,7 +22,7 @@ class DashboardListView extends StatelessWidget {
     if (filteredHabits.isEmpty) {
       return Center(
         child: Card(
-          color: Colors.orangeAccent,
+          color: Colors.orange,
           margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Padding(
             padding: EdgeInsets.all(16.0),
