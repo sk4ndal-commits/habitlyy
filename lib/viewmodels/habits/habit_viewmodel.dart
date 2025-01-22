@@ -28,12 +28,47 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
           userId: userId,
         );
 
+  /// Convert the object to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'priority': priority.toString(),
+      // Assuming priority is an enum
+      'startDate': startDate.toIso8601String(),
+      'deadline': deadline.toIso8601String(),
+      'targetHours': targetHours,
+      'frequencyDays': frequencyDays?.map((day) => day.toString()).toList(),
+      // Assuming FrequencyDay is an enum or similar
+      'userId': userId,
+    };
+  }
+
+  /// Create an object from JSON
+  factory TimeInvestmentHabitViewModel.fromJson(Map<String, dynamic> json) {
+    return TimeInvestmentHabitViewModel(
+      id: json['id'] as int,
+      title: json['title'] as String,
+      priority: HabitPriority.values
+          .firstWhere((e) => e.toString() == json['priority']),
+      // Assuming HabitPriority is an Enum
+      startDate: DateTime.parse(json['startDate'] as String),
+      deadline: DateTime.parse(json['deadline'] as String),
+      targetHours: (json['targetHours'] as num).toDouble(),
+      frequencyDays: (json['frequencyDays'] as List<dynamic>?)
+          ?.map((e) => FrequencyDay.values.firstWhere((f) => f.toString() == e))
+          .toList(),
+      // Parse frequencyDays enums
+      userId: json['userId'] as int,
+    );
+  }
+
   factory TimeInvestmentHabitViewModel.fromMap(Map<String, dynamic> map) {
     return TimeInvestmentHabitViewModel(
       id: map['id'] as int,
       title: map['title'] as String,
       priority: HabitPriority.values.firstWhere(
-            (e) => e.toString() == map['priority'],
+        (e) => e.toString() == map['priority'],
       ),
       startDate: DateTime.parse(map['startDate'] as String),
       deadline: DateTime.parse(map['deadline'] as String),
@@ -47,13 +82,13 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
       ..investedHours = map['investedHours'] as double
       ..progressLog = (map['progressLog'] as String).isNotEmpty
           ? List<Map<String, dynamic>>.from(
-          (map['progressLog'] as String).split('|').map((log) {
-            final logParts = log.split(':');
-            return {
-              "date": logParts[0],
-              "hours": double.parse(logParts[1]),
-            };
-          }))
+              (map['progressLog'] as String).split('|').map((log) {
+              final logParts = log.split(':');
+              return {
+                "date": logParts[0],
+                "hours": double.parse(logParts[1]),
+              };
+            }))
           : [];
   }
 

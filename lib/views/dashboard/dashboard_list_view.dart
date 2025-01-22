@@ -1,81 +1,81 @@
 import 'package:flutter/material.dart';
-import 'package:habitlyy/service_locator.dart';
+import 'package:provider/provider.dart';
 import 'package:habitlyy/viewmodels/habits/habit_viewmodel.dart';
 import 'package:habitlyy/views/dashboard/dashboard_list_item_view.dart';
-import '../../services/habits/ihabits_service.dart';
+import '../../providers/habit_provider.dart';
 
-class DashboardListView extends StatefulWidget {
+class DashboardListView extends StatelessWidget {
   @override
-  _DashboardListViewState createState() => _DashboardListViewState();
-}
+  Widget build(BuildContext context) {
+    final habitsProvider = Provider.of<HabitsProvider>(context, listen: true);
+    final todayHabits = habitsProvider.todayHabits;
 
-class _DashboardListViewState extends State<DashboardListView> {
-  late Future<List<TimeInvestmentHabitViewModel>> _todayHabitsFuture;
+    // If no habits are set for today (empty list)
+    if (todayHabits.isEmpty) {
+      return Center(child: Text('No habits for today'));
+    }
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchTodayHabits(); // Initialize the future
+    // Filter habits to show only the ones not yet completed
+    final filteredHabits = _filterAndSortHabits(todayHabits);
+
+    // If all habits are completed, show a congratulatory card
+    if (filteredHabits.isEmpty) {
+      return Center(
+        child: Card(
+          color: Colors.orangeAccent,
+          margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.check_circle, color: Colors.green, size: 48.0),
+                SizedBox(height: 8.0),
+                Text(
+                  'Congrats!',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 8.0),
+                Text(
+                  'All tasks are completed for today.',
+                  style: TextStyle(fontSize: 16.0, color: Colors.black),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Else, show the filtered habit list
+    return _buildHabitList(filteredHabits);
   }
 
-  // Fetch today's habits asynchronously
-  Future<void> _fetchTodayHabits() async {
-    final habitsService = getIt<IHabitsService>();
-    _todayHabitsFuture = habitsService.getTodayHabitsAsync();
-    await _todayHabitsFuture;
-  }
-
-  // Filters and sorts the habits (not async since we already fetched the data)
   List<TimeInvestmentHabitViewModel> _filterAndSortHabits(
       List<TimeInvestmentHabitViewModel> habits) {
     final filteredHabits = habits
         .where((habit) => habit.investedHours < habit.targetHours)
         .toList();
+
     filteredHabits.sort((a, b) => a.priority.index.compareTo(b.priority.index));
+
     return filteredHabits;
   }
 
-  // Builds the widget for the filtered habits list
   Widget _buildHabitList(List<TimeInvestmentHabitViewModel> habits) {
     return ListView.builder(
       itemCount: habits.length,
       itemBuilder: (context, index) {
         final habit = habits[index];
+
         return DashboardListItemView(
           habit: habit,
-          onHabitUpdated: (updateHabit) {
-            // Refresh habits when updated
-            setState(() {
-              habits[index] = updateHabit;
-            });
-          },
         );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<List<TimeInvestmentHabitViewModel>>(
-      future: _todayHabitsFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
-          ); // Show loading indicator while fetching data
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text('Error: ${snapshot.error}'),
-          ); // Error handling
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(
-            child: Text('No habits for today'),
-          ); // Handle no data case
-        } else {
-          // Filter and sort the habits before rendering
-          final filteredHabits = _filterAndSortHabits(snapshot.data!);
-          return _buildHabitList(filteredHabits);
-        }
       },
     );
   }

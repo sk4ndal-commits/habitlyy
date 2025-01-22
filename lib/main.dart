@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:habitlyy/providers/habit_provider.dart';
+import 'package:habitlyy/services/habits/ihabits_service.dart';
 import 'package:habitlyy/services/profile/iuser_service.dart';
 import 'package:habitlyy/views/homepage/homepage_view.dart';
 import 'package:habitlyy/views/login/login_view.dart';
@@ -13,22 +14,21 @@ import 'generated/l10n.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await setupLocator();
-  runApp(MyApp());
+  runApp(HabitsApp());
 }
 
-class MyApp extends StatefulWidget {
+class HabitsApp extends StatefulWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  _HabitsAppState createState() => _HabitsAppState();
 }
 
-class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+class _HabitsAppState extends State<HabitsApp> with WidgetsBindingObserver {
   late final IUserService _userService;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-
     _userService = getIt<IUserService>();
   }
 
@@ -49,12 +49,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final userService = getIt<IUserService>();
+    final habitsService = getIt<IHabitsService>();
 
     try {
       final currentUser = userService.getCurrentUserAsync();
       return MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (_) => HabitsProvider()),
+          ChangeNotifierProvider(create: (_) => HabitsProvider(habitsService)),
         ],
         child: MaterialApp(
           themeMode: ThemeMode.system,

@@ -424,7 +424,7 @@ class _HabitListViewState extends State<HabitListView> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Error deleting habit: $e'),
-                          duration: Duration(seconds: 2),
+                          duration: Duration(seconds: 1 ),
                         ),
                       );
                     }

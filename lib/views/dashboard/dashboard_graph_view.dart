@@ -1,51 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import '../../service_locator.dart';
-import '../../services/habits/ihabits_service.dart';
+import '../../providers/habit_provider.dart';
 import '../../viewmodels/habits/habit_viewmodel.dart';
 
-class DashboardGraphView extends StatefulWidget {
-  @override
-  _DashboardGraphViewState createState() => _DashboardGraphViewState();
-}
-
-class _DashboardGraphViewState extends State<DashboardGraphView> {
-  late Future<List<TimeInvestmentHabitViewModel>> _todayHabitsFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData(); // Initialize the future
-  }
-
-  // Fetch today's habits asynchronously
-  void _loadData() async {
-    final habitsService = getIt<IHabitsService>();
-    _todayHabitsFuture = habitsService.getTodayHabitsAsync();
-    await _todayHabitsFuture;
-  }
-
+class DashboardGraphView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<TimeInvestmentHabitViewModel>>(
-      future: _todayHabitsFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('No habits for today'));
-        } else {
-          // Process the habits and build the UI
-          final todayHabits = snapshot.data!;
-          return _buildDashboardGraph(todayHabits);
-        }
-      },
-    );
+    // Access `HabitsProvider`
+    final habitsProvider = Provider.of<HabitsProvider>(context);
+    final todayHabits = habitsProvider.todayHabits;
+
+    return todayHabits.isEmpty
+        ? Center(child: Text('No habits for today'))
+        : _buildDashboardGraph(todayHabits);
   }
 
-  // Build the UI based on the habits data
+  // Process the habits and build the graphical UI
   Widget _buildDashboardGraph(List<TimeInvestmentHabitViewModel> todayHabits) {
     double totalTargetHours =
     todayHabits.fold(0, (sum, habit) => sum + habit.targetHours);
@@ -57,6 +28,7 @@ class _DashboardGraphViewState extends State<DashboardGraphView> {
     int totalTasks = todayHabits.length;
     double progress = totalTasks > 0 ? completedTasks / totalTasks : 0.0;
 
+    // Prepare data for the pie chart
     final data = [
       PieChartData('Done', totalInvestedHours, Colors.green),
       PieChartData(
@@ -72,6 +44,7 @@ class _DashboardGraphViewState extends State<DashboardGraphView> {
     );
   }
 
+  // Render a pie chart using Syncfusion
   Widget _buildPieChart(List<PieChartData> data) {
     return Container(
       height: 150,
@@ -83,7 +56,7 @@ class _DashboardGraphViewState extends State<DashboardGraphView> {
             yValueMapper: (PieChartData data, _) => data.value,
             pointColorMapper: (PieChartData data, _) => data.color,
             dataLabelMapper: (PieChartData data, _) =>
-            '${data.label} \n ${data.value.toStringAsFixed(1)}h',
+            '${data.label}\n${data.value.toStringAsFixed(2)}h',
             dataLabelSettings: DataLabelSettings(
               isVisible: true,
               textStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
@@ -99,6 +72,7 @@ class _DashboardGraphViewState extends State<DashboardGraphView> {
     );
   }
 
+  // Render the linear progress section
   Widget _buildProgressSection(
       double progress, int completedTasks, int totalTasks) {
     return Padding(

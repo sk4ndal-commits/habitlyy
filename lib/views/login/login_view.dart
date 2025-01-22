@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:habitlyy/service_locator.dart';
+import 'package:provider/provider.dart';
 
+import '../../providers/habit_provider.dart';
 import '../../services/profile/iuser_service.dart';
 
 class LoginView extends StatelessWidget {
@@ -33,12 +35,16 @@ class LoginView extends StatelessWidget {
             ),
             SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 final email = emailController.text;
                 final password = passwordController.text;
                 final userService = getIt<IUserService>();
-                final user = userService.loginAsync(email, password);
+                final user = await userService.loginAsync(email, password);
                 if (user != null) {
+                  final habitsProvider =
+                      Provider.of<HabitsProvider>(context, listen: false);
+                  await habitsProvider.initializeHabitsAsync(user.id);
+
                   Navigator.of(context).pushReplacementNamed('/home');
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(

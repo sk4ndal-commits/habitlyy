@@ -6,9 +6,8 @@ import 'dart:async';
 
 class DashboardListItemView extends StatefulWidget {
   final TimeInvestmentHabitViewModel habit;
-  final ValueChanged<TimeInvestmentHabitViewModel> onHabitUpdated;
 
-  DashboardListItemView({required this.habit, required this.onHabitUpdated});
+  DashboardListItemView({required this.habit});
 
   @override
   _DashboardListItemViewState createState() => _DashboardListItemViewState();
@@ -203,8 +202,6 @@ class _DashboardListItemViewState extends State<DashboardListItemView> {
       ),
       TextButton(
         child: Text('Save'),
-
-        // TODO: we need to save invested hours to db
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
             final newInvestedHours = double.tryParse(controller.text);
@@ -212,7 +209,6 @@ class _DashboardListItemViewState extends State<DashboardListItemView> {
               await Provider.of<HabitsProvider>(context, listen: false)
                   .updateInvestedHoursAsync(widget.habit, newInvestedHours);
               setState(() {});
-              widget.onHabitUpdated(widget.habit);
               Navigator.of(context).pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
