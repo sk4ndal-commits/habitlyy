@@ -24,11 +24,27 @@ class HabitsProvider with ChangeNotifier {
     notifyListeners(); // Notify listeners that habits are loaded
   }
 
+  /// Retrieve filtered and sorted habits (with invested hours < target hours)
+  List<TimeInvestmentHabitViewModel> get filteredAndSortedHabits {
+    final filteredHabits = _todayHabits
+        .where((habit) => habit.investedHours < habit.targetHours)
+        .toList();
+
+    filteredHabits.sort((a, b) => b.priority.index.compareTo(a.priority.index));
+
+    return filteredHabits;
+  }
+
+
   /// Add a new habit
   Future<void> addHabitAsync(TimeInvestmentHabitViewModel habit) async {
     await _habitsService.addHabitAsync(habit); // Save habit via service
     _todayHabits.add(habit); // Add habit to the in-memory list
     notifyListeners(); // Notify listeners about the addition
+  }
+
+  void _sortHabits() {
+    _todayHabits.sort((a, b) => a.priority.index.compareTo(b.priority.index));
   }
 
   /// Update an existing habit
@@ -38,6 +54,7 @@ class HabitsProvider with ChangeNotifier {
     final index = _todayHabits.indexWhere((h) => h.id == updatedHabit.id);
     if (index != -1) {
       _todayHabits[index] = updatedHabit; // Update in-memory habit
+      _sortHabits();
       notifyListeners(); // Notify listeners about the update
     }
   }

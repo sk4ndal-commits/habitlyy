@@ -16,7 +16,7 @@ class DashboardListView extends StatelessWidget {
     }
 
     // Filter habits to show only the ones not yet completed
-    final filteredHabits = _filterAndSortHabits(todayHabits);
+    final filteredHabits = habitsProvider.filteredAndSortedHabits;
 
     // If all habits are completed, show a congratulatory card
     if (filteredHabits.isEmpty) {
@@ -54,17 +54,6 @@ class DashboardListView extends StatelessWidget {
 
     // Else, show the filtered habit list
     return _buildHabitList(filteredHabits);
-  }
-
-  List<TimeInvestmentHabitViewModel> _filterAndSortHabits(
-      List<TimeInvestmentHabitViewModel> habits) {
-    final filteredHabits = habits
-        .where((habit) => habit.investedHours < habit.targetHours)
-        .toList();
-
-    filteredHabits.sort((a, b) => a.priority.index.compareTo(b.priority.index));
-
-    return filteredHabits;
   }
 
   Widget _buildHabitList(List<TimeInvestmentHabitViewModel> habits) {
