@@ -35,7 +35,6 @@ class HabitsProvider with ChangeNotifier {
     return filteredHabits;
   }
 
-
   /// Add a new habit
   Future<void> addHabitAsync(TimeInvestmentHabitViewModel habit) async {
     await _habitsService.addHabitAsync(habit); // Save habit via service
@@ -48,7 +47,8 @@ class HabitsProvider with ChangeNotifier {
   }
 
   /// Update an existing habit
-  Future<void> updateHabitAsync(TimeInvestmentHabitViewModel updatedHabit) async {
+  Future<void> updateHabitAsync(
+      TimeInvestmentHabitViewModel updatedHabit) async {
     await _habitsService
         .updateHabitAsync(updatedHabit); // Update habit via service
     final index = _todayHabits.indexWhere((h) => h.id == updatedHabit.id);
