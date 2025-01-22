@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/habits/ihabits_service.dart';
 import '../viewmodels/habits/habit_viewmodel.dart';
 
+/// Adds an in-memory provider layer on top of the <cref="IHabitsService">
+/// for efficient state management
 class HabitsProvider with ChangeNotifier {
   final IHabitsService _habitsService; // Service is injected into the provider
 
@@ -44,6 +46,9 @@ class HabitsProvider with ChangeNotifier {
   Future<void> deleteHabitAsync(int habitId) async {
     await _habitsService.deleteHabitAsync(habitId); // Remove habit via service
     _todayHabits.removeWhere((habit) => habit.id == habitId); // Update state
+
+    await _saveHabitsToLocalStorage();
+
     notifyListeners(); // Notify listeners about the deletion
   }
 

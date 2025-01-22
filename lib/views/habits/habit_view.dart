@@ -333,13 +333,13 @@ class _HabitViewState extends State<HabitView> {
   ) {
     return [
       ElevatedButton(
-        child: Text('Cancel', style: TextStyle(color: Colors.orange),),
+        child: Text('Cancel'),
         onPressed: () {
           Navigator.of(context).pop();
         },
       ),
       ElevatedButton(
-        child: Text('Save', style: TextStyle(color: Colors.green),),
+        child: Text('Save'),
         onPressed: () async {
           setState(() {
             // Update the habit details
@@ -378,13 +378,13 @@ class _HabitViewState extends State<HabitView> {
           content: Text('Do you really want to delete this habit?'),
           actions: <Widget>[
             ElevatedButton(
-              child: Text('No', style: TextStyle(color: Colors.orange),),
+              child: Text('No'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             ElevatedButton(
-              child: Text('Yes', style: TextStyle(color: Colors.green),),
+              child: Text('Yes'),
               onPressed: () async {
                 await widget.habitsProvider.deleteHabitAsync(widget.habit.id);
 

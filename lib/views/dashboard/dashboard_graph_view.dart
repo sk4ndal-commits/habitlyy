@@ -18,10 +18,11 @@ class DashboardGraphView extends StatelessWidget {
 
   // Process the habits and build the graphical UI
   Widget _buildDashboardGraph(List<TimeInvestmentHabitViewModel> todayHabits) {
+    // Recalculate metrics to ensure they reflect the current state
     double totalTargetHours =
-    todayHabits.fold(0, (sum, habit) => sum + habit.targetHours);
+        todayHabits.fold(0, (sum, habit) => sum + habit.targetHours);
     double totalInvestedHours =
-    todayHabits.fold(0, (sum, habit) => sum + habit.investedHours);
+        todayHabits.fold(0, (sum, habit) => sum + habit.investedHours);
 
     int completedTasks =
         todayHabits.where((habit) => habit.isCompleted()).length;
@@ -56,7 +57,7 @@ class DashboardGraphView extends StatelessWidget {
             yValueMapper: (PieChartData data, _) => data.value,
             pointColorMapper: (PieChartData data, _) => data.color,
             dataLabelMapper: (PieChartData data, _) =>
-            '${data.label}\n${data.value.toStringAsFixed(2)}h',
+                '${data.label}\n${data.value.toStringAsFixed(2)}h',
             dataLabelSettings: DataLabelSettings(
               isVisible: true,
               textStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),

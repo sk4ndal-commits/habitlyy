@@ -138,7 +138,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: Text('Cancel', style: TextStyle(color: Colors.orange),),
+          child: Text('Cancel'),
         ),
         ElevatedButton(
           onPressed: () {
@@ -153,7 +153,7 @@ class _EditProfileDialogState extends State<EditProfileDialog> {
             widget.onSave(updatedUser);
             Navigator.of(context).pop();
           },
-          child: Text('Save', style: TextStyle(color: Colors.green),),
+          child: Text('Save'),
         ),
       ],
     );

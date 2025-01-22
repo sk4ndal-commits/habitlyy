@@ -22,7 +22,6 @@ class LoginView extends StatelessWidget {
               },
               child: Text(
                 'See what the app offers',
-                style: TextStyle(color: Colors.green),
               ),
             ),
             SizedBox(height: 16.0),
@@ -54,13 +53,13 @@ class LoginView extends StatelessWidget {
                   );
                 }
               },
-              child: Text('Login', style: TextStyle(color: Colors.green),),
+              child: Text('Login'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pushNamed('/register');
               },
-              child: Text('Register', style: TextStyle(color: Colors.orange),),
+              child: Text('Register'),
             ),
           ],
         ),

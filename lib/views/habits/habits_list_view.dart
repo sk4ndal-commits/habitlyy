@@ -88,11 +88,11 @@ class _HabitListViewState extends State<HabitListView> {
           ),
           actions: [
             ElevatedButton(
-              child: Text('Cancel', style: TextStyle(color: Colors.orange),),
+              child: Text('Cancel'),
               onPressed: () => Navigator.of(context).pop(),
             ),
             ElevatedButton(
-              child: Text('Add', style: TextStyle(color: Colors.green),),
+              child: Text('Add'),
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   final newHabit = TimeInvestmentHabitViewModel(
@@ -191,7 +191,7 @@ class _HabitListViewState extends State<HabitListView> {
           ),
           actions: [
             ElevatedButton(
-              child: Text('Clear', style: TextStyle(color: Colors.orange),),
+              child: Text('Clear'),
               onPressed: () {
                 setState(() {
                   _selectedPriority = null;
@@ -202,7 +202,7 @@ class _HabitListViewState extends State<HabitListView> {
               },
             ),
             ElevatedButton(
-              child: Text('Apply', style: TextStyle(color: Colors.green),),
+              child: Text('Apply'),
               onPressed: () {
                 setState(() {
                   _selectedPriority = tempSelectedPriority;

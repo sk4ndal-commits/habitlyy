@@ -194,14 +194,14 @@ class _DashboardListItemViewState extends State<DashboardListItemView> {
       TextEditingController controller, void Function() stopTimer) {
     return [
       ElevatedButton(
-        child: Text('Cancel', style: TextStyle(color: Colors.orange),),
+        child: Text('Cancel'),
         onPressed: () {
           stopTimer();
           Navigator.of(context).pop();
         },
       ),
       ElevatedButton(
-        child: Text('Save', style: TextStyle(color: Colors.green),),
+        child: Text('Save'),
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
             final newInvestedHours = double.tryParse(controller.text);
