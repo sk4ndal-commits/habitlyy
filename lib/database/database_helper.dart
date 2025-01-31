@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:habitlyy/database/db_config.dart';
+import 'package:habitlyy/database/database_config.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -19,7 +19,7 @@ class DatabaseHelper {
 
   Future<Database> _initDatabase() async {
     final path = await getDatabasesPath();
-    final dbPath = join(path, DBConfig().DBName);
+    final dbPath = join(path, DatabaseConfig().DBName);
 
     return await openDatabase(
       dbPath,
