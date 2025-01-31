@@ -99,8 +99,6 @@ class _HabitViewState extends State<HabitView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildDateRow(Icons.calendar_month, widget.habit.startDate),
-        _buildDateRow(Icons.calendar_month_outlined, widget.habit.deadline),
         _buildTargetHoursRow(),
       ],
     );
@@ -121,7 +119,7 @@ class _HabitViewState extends State<HabitView> {
       children: [
         Icon(Icons.access_time, size: 16.0, color: Colors.grey),
         SizedBox(width: 4.0),
-        Text('${widget.habit.targetHours}h'),
+        Text('${widget.habit.targetHours}h a day'),
       ],
     );
   }
@@ -179,10 +177,6 @@ class _HabitViewState extends State<HabitView> {
   }
 
   void _showEditDialog(BuildContext context) {
-    TextEditingController startDateController = TextEditingController(
-        text: widget.habit.startDate.toLocal().toString().split(' ')[0]);
-    TextEditingController deadlineController = TextEditingController(
-        text: widget.habit.deadline.toLocal().toString().split(' ')[0]);
     TextEditingController targetHoursController =
         TextEditingController(text: widget.habit.targetHours.toString());
     List<FrequencyDay> selectedFrequencyDays = [];
@@ -193,15 +187,11 @@ class _HabitViewState extends State<HabitView> {
         return AlertDialog(
           title: Text('${widget.habit.title}'),
           content: _buildEditDialogContent(
-            startDateController,
-            deadlineController,
             targetHoursController,
             selectedFrequencyDays,
           ),
           actions: _buildEditDialogActions(
             context,
-            startDateController,
-            deadlineController,
             targetHoursController,
             selectedFrequencyDays,
           ),
@@ -211,8 +201,6 @@ class _HabitViewState extends State<HabitView> {
   }
 
   Widget _buildEditDialogContent(
-    TextEditingController startDateController,
-    TextEditingController deadlineController,
     TextEditingController targetHoursController,
     List<FrequencyDay> selectedFrequencyDays,
   ) {
@@ -222,10 +210,6 @@ class _HabitViewState extends State<HabitView> {
       children: [
         SizedBox(height: 8.0),
         _buildPriorityDropdown(),
-        SizedBox(height: 8.0),
-        _buildDatePickerField('Start Date', startDateController),
-        SizedBox(height: 8.0),
-        _buildDatePickerField('Deadline', deadlineController),
         SizedBox(height: 8.0),
         _buildTextField('Target Hours', targetHoursController),
         SizedBox(height: 8.0),
@@ -326,8 +310,6 @@ class _HabitViewState extends State<HabitView> {
 
   List<Widget> _buildEditDialogActions(
     BuildContext context,
-    TextEditingController startDateController,
-    TextEditingController deadlineController,
     TextEditingController targetHoursController,
     List<FrequencyDay> selectedFrequencyDays,
   ) {
@@ -344,8 +326,6 @@ class _HabitViewState extends State<HabitView> {
           setState(() {
             // Update the habit details
             widget.habit.priority = _selectedPriority;
-            widget.habit.startDate = DateTime.parse(startDateController.text);
-            widget.habit.deadline = DateTime.parse(deadlineController.text);
             widget.habit.targetHours = double.parse(targetHoursController.text);
             if (selectedFrequencyDays.isNotEmpty) {
               widget.habit.frequencyDays = selectedFrequencyDays;

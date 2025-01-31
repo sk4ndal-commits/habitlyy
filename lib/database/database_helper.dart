@@ -46,8 +46,6 @@ class DatabaseHelper {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT,
         priority TEXT,
-        startDate TEXT,
-        deadline TEXT,
         targetHours REAL,
         frequencyDays TEXT,
         userId INTEGER,

@@ -13,8 +13,6 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
     required int id,
     required String title,
     required HabitPriority priority,
-    required DateTime startDate,
-    required DateTime deadline,
     required this.targetHours,
     required List<FrequencyDay>? frequencyDays,
     required int userId,
@@ -22,8 +20,6 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
           id: id,
           title: title,
           priority: priority,
-          startDate: startDate,
-          deadline: deadline,
           frequencyDays: frequencyDays,
           userId: userId,
         );
@@ -35,8 +31,6 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
       'title': title,
       'priority': priority.toString(),
       // Assuming priority is an enum
-      'startDate': startDate.toIso8601String(),
-      'deadline': deadline.toIso8601String(),
       'targetHours': targetHours,
       'frequencyDays': frequencyDays?.map((day) => day.toString()).toList(),
       // Assuming FrequencyDay is an enum or similar
@@ -52,8 +46,6 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
       priority: HabitPriority.values
           .firstWhere((e) => e.toString() == json['priority']),
       // Assuming HabitPriority is an Enum
-      startDate: DateTime.parse(json['startDate'] as String),
-      deadline: DateTime.parse(json['deadline'] as String),
       targetHours: (json['targetHours'] as num).toDouble(),
       frequencyDays: (json['frequencyDays'] as List<dynamic>?)
           ?.map((e) => FrequencyDay.values.firstWhere((f) => f.toString() == e))
@@ -70,8 +62,6 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
       priority: HabitPriority.values.firstWhere(
         (e) => e.toString() == map['priority'],
       ),
-      startDate: DateTime.parse(map['startDate'] as String),
-      deadline: DateTime.parse(map['deadline'] as String),
       targetHours: map['targetHours'] as double,
       frequencyDays: (map['frequencyDays'] as String?)
           ?.split(',')
@@ -105,10 +95,6 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
 
   bool isCompleted() {
     return investedHours >= targetHours;
-  }
-
-  bool isOverdue() {
-    return DateTime.now().isAfter(deadline);
   }
 
   List<Map<String, dynamic>> getCumulativeProgress() {

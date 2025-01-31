@@ -8,8 +8,6 @@ class HabitViewModelBase {
   String title;
   HabitPriority priority;
   late bool completed;
-  DateTime startDate;
-  DateTime deadline;
   late DateTime lastUpdated;
   List<FrequencyDay>? frequencyDays;
   final int userId;
@@ -18,8 +16,6 @@ class HabitViewModelBase {
     required this.id,
     required this.title,
     required this.priority,
-    required this.startDate,
-    required this.deadline,
     required this.frequencyDays,
     required this.userId,
   }) {
@@ -30,10 +26,6 @@ class HabitViewModelBase {
   @override
   String toString() {
     return '$title - $priority';
-  }
-
-  int daysLeft() {
-    return deadline.difference(DateTime.now()).inDays;
   }
 
   bool isCompleted() {

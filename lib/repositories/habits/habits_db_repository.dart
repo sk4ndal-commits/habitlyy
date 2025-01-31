@@ -18,8 +18,6 @@ class HabitsDBRepository implements IHabitsRepository {
       {
         'title': habit.title,
         'priority': habit.priority.toString(),
-        'startDate': habit.startDate.toIso8601String(),
-        'deadline': habit.deadline.toIso8601String(),
         'targetHours': habit.targetHours,
         'frequencyDays':
             habit.frequencyDays != null ? habit.frequencyDays.toString() : null,
@@ -35,8 +33,6 @@ class HabitsDBRepository implements IHabitsRepository {
       {
         'title': habit.title,
         'priority': habit.priority.toString(),
-        'startDate': habit.startDate.toIso8601String(),
-        'deadline': habit.deadline.toIso8601String(),
         'targetHours': habit.targetHours,
         'frequencyDays': habit.frequencyDays != null
             ? habit.frequencyDays?.map((e) => e.toString()).join(",")
@@ -83,8 +79,6 @@ class HabitsDBRepository implements IHabitsRepository {
       id: row['id'] as int,
       title: row['title'] as String,
       priority: _parsePriority(row['priority'] as String),
-      startDate: DateTime.parse(row['startDate'] as String),
-      deadline: DateTime.parse(row['deadline'] as String),
       targetHours: row['targetHours'] as double,
       frequencyDays: row['frequencyDays'] != null
           ? _parseFrequencyDays(row['frequencyDays'] as String)

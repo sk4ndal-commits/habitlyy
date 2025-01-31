@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:habitlyy/providers/habit_provider.dart';
 import 'package:habitlyy/service_locator.dart';
 import 'package:provider/provider.dart';
+
 import '../../enums/frequency_days.dart';
 import '../../enums/habit_priority.dart';
 import '../../services/habits/ihabits_service.dart';
@@ -45,26 +46,22 @@ class _HabitListViewState extends State<HabitListView> {
   void _addHabit(HabitsProvider habitsProvider) {
     final titleController = TextEditingController();
     final targetHoursController = TextEditingController();
-    final startDateController = TextEditingController();
-    final deadlineController = TextEditingController();
     HabitPriority priority = HabitPriority.LOW;
 
     _showAddHabitDialog(
       titleController,
       targetHoursController,
-      startDateController,
-      deadlineController,
       priority,
       habitsProvider,
     );
   }
 
-  void _showAddHabitDialog(TextEditingController titleController,
-      TextEditingController targetHoursController,
-      TextEditingController startDateController,
-      TextEditingController deadlineController,
-      HabitPriority priority,
-      HabitsProvider habitsProvider,) {
+  void _showAddHabitDialog(
+    TextEditingController titleController,
+    TextEditingController targetHoursController,
+    HabitPriority priority,
+    HabitsProvider habitsProvider,
+  ) {
     List<FrequencyDay> selectedFrequencyDays = [];
     showDialog(
       context: context,
@@ -79,8 +76,6 @@ class _HabitListViewState extends State<HabitListView> {
                 _buildTextField(titleController, "Title"),
                 _buildTextFormField(
                     targetHoursController, "Target Hours (in numbers)"),
-                _buildDatePickerField("Start Date", startDateController),
-                _buildDatePickerField("Deadline", deadlineController),
                 _buildPriorityDropdown(priority),
                 _buildFrequencyDaysChips(selectedFrequencyDays),
               ],
@@ -96,13 +91,9 @@ class _HabitListViewState extends State<HabitListView> {
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   final newHabit = TimeInvestmentHabitViewModel(
-                    id: DateTime
-                        .now()
-                        .millisecondsSinceEpoch,
+                    id: DateTime.now().millisecondsSinceEpoch,
                     title: titleController.text,
                     priority: priority,
-                    startDate: DateTime.parse(startDateController.text),
-                    deadline: DateTime.parse(deadlineController.text),
                     targetHours: double.parse(targetHoursController.text),
                     frequencyDays: selectedFrequencyDays,
                     userId: await userService.getCurrentUserAsync()!.id,
@@ -162,10 +153,7 @@ class _HabitListViewState extends State<HabitListView> {
                 items: HabitPriority.values.map((priority) {
                   return DropdownMenuItem<HabitPriority>(
                     value: priority,
-                    child: Text(priority
-                        .toString()
-                        .split('.')
-                        .last),
+                    child: Text(priority.toString().split('.').last),
                   );
                 }).toList(),
               ),
@@ -226,9 +214,6 @@ class _HabitListViewState extends State<HabitListView> {
       if (_filterCompleted && !habit.isCompleted()) {
         return false;
       }
-      if (_filterOverdue && !habit.isOverdue()) {
-        return false;
-      }
       return true;
     }).toList();
   }
@@ -240,8 +225,10 @@ class _HabitListViewState extends State<HabitListView> {
     );
   }
 
-  Widget _buildTextFormField(TextEditingController controller,
-      String labelText,) {
+  Widget _buildTextFormField(
+    TextEditingController controller,
+    String labelText,
+  ) {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(labelText: labelText),
@@ -285,7 +272,7 @@ class _HabitListViewState extends State<HabitListView> {
       await habitsProvider.deleteHabitAsync(habitId);
       setState(() {
         _localHabits.removeWhere(
-                (habit) => habit.id == habitId); // Remove habit from local list
+            (habit) => habit.id == habitId); // Remove habit from local list
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -318,10 +305,7 @@ class _HabitListViewState extends State<HabitListView> {
           items: HabitPriority.values.map((HabitPriority classType) {
             return DropdownMenuItem<HabitPriority>(
               value: classType,
-              child: Text(classType
-                  .toString()
-                  .split('.')
-                  .last),
+              child: Text(classType.toString().split('.').last),
             );
           }).toList(),
         ),
@@ -344,11 +328,7 @@ class _HabitListViewState extends State<HabitListView> {
               spacing: 8.0,
               children: FrequencyDay.values.map((day) {
                 return ChoiceChip(
-                  label: Text(day
-                      .toString()
-                      .split('.')
-                      .last
-                      .substring(0, 2)),
+                  label: Text(day.toString().split('.').last.substring(0, 2)),
                   selected: selectedFrequencyDays.contains(day),
                   onSelected: (bool selected) {
                     setState(() {
@@ -373,42 +353,31 @@ class _HabitListViewState extends State<HabitListView> {
     final filteredHabits = _applyFilters();
 
     return Scaffold(
-        body: filteredHabits.isEmpty
-            ? Center(child: Text("No habits found"))
-            : ListView.builder(
-          itemCount: filteredHabits.length,
-          itemBuilder: (context, index) {
-            final habit = filteredHabits[index];
-            return HabitView(
-              habit: habit,
-              onDelete: () => _deleteHabit(habit.id, habitsProvider),
-              habitsProvider: habitsProvider,
-            );
-          },
-        ),
-        floatingActionButton: Stack(
-          children: [
-            Align(
-              alignment: Alignment.bottomRight,
-              child: FloatingActionButton(
-                onPressed: _showFilterDialog,
-                backgroundColor: Colors.orange,
-                child: Icon(Icons.filter_list),
-              ),
+      body: filteredHabits.isEmpty
+          ? Center(child: Text("No habits found"))
+          : ListView.builder(
+              itemCount: filteredHabits.length,
+              itemBuilder: (context, index) {
+                final habit = filteredHabits[index];
+                return HabitView(
+                  habit: habit,
+                  onDelete: () => _deleteHabit(habit.id, habitsProvider),
+                  habitsProvider: habitsProvider,
+                );
+              },
             ),
-            Padding(
-              padding: const EdgeInsets.only(right: 70.0),
-              child: Align(
-                alignment: Alignment.bottomRight,
-                child: FloatingActionButton(
-                  backgroundColor: Colors.orange,
-                  onPressed: () => _addHabit(habitsProvider),
-                  child: Icon(Icons.add),
-                ),
-              ),
+      floatingActionButton: Stack(
+        children: [
+          Align(
+            alignment: Alignment.bottomRight,
+            child: FloatingActionButton(
+              onPressed: () => _addHabit(habitsProvider),
+              backgroundColor: Colors.orange,
+              child: Icon(Icons.add),
             ),
-          ],
-        ),
+          ),
+        ],
+      ),
     );
   }
 }
