@@ -22,9 +22,6 @@ class _HabitListViewState extends State<HabitListView> {
   final habitsService = getIt<IHabitsService>();
   final userService = getIt<IUserService>();
   List<TimeInvestmentHabitViewModel> _localHabits = [];
-  HabitPriority? _selectedPriority;
-  bool _filterCompleted = false;
-  bool _filterOverdue = false; // Filters for completed and overdue habits
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -59,163 +56,86 @@ class _HabitListViewState extends State<HabitListView> {
   void _showAddHabitDialog(
     TextEditingController titleController,
     TextEditingController targetHoursController,
-    HabitPriority priority,
+    HabitPriority initialPriority,
     HabitsProvider habitsProvider,
   ) {
     List<FrequencyDay> selectedFrequencyDays = [];
+    HabitPriority currentPriority =
+        initialPriority; // Maintain the updated priority
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Add Habit'),
-          content: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                _buildTextField(titleController, "Title"),
-                _buildTextFormField(
-                    targetHoursController, "Target Hours (in numbers)"),
-                _buildPriorityDropdown(priority),
-                _buildFrequencyDaysChips(selectedFrequencyDays),
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: Text('Add Habit'),
+              content: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    _buildTextField(titleController, "Title"),
+                    _buildTextFormField(
+                        targetHoursController, "Target Hours (in numbers)"),
+                    _buildPriorityDropdown(currentPriority, (newPriority) {
+                      setState(() {
+                        currentPriority =
+                            newPriority; // Update local priority state
+                      });
+                    }),
+                    _buildFrequencyDaysChips(selectedFrequencyDays, setState),
+                  ],
+                ),
+              ),
+              actions: [
+                ElevatedButton(
+                  child: Text('Cancel'),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                ElevatedButton(
+                  child: Text('Add'),
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      final newHabit = TimeInvestmentHabitViewModel(
+                        id: DateTime.now().millisecondsSinceEpoch,
+                        title: titleController.text,
+                        priority: currentPriority,
+                        // Use the updated priority
+                        targetHours: double.parse(targetHoursController.text),
+                        frequencyDays: selectedFrequencyDays,
+                        userId: await userService.getCurrentUserAsync()!.id,
+                      );
+
+                      try {
+                        await habitsProvider.addHabitAsync(newHabit);
+                        setState(() {
+                          _localHabits.add(newHabit);
+                        });
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('${newHabit.title} added'),
+                            duration: Duration(seconds: 1),
+                          ),
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Error adding habit: $e'),
+                            duration: Duration(seconds: 1),
+                          ),
+                        );
+                      }
+                    }
+                  },
+                ),
               ],
-            ),
-          ),
-          actions: [
-            ElevatedButton(
-              child: Text('Cancel'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            ElevatedButton(
-              child: Text('Add'),
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  final newHabit = TimeInvestmentHabitViewModel(
-                    id: DateTime.now().millisecondsSinceEpoch,
-                    title: titleController.text,
-                    priority: priority,
-                    targetHours: double.parse(targetHoursController.text),
-                    frequencyDays: selectedFrequencyDays,
-                    userId: await userService.getCurrentUserAsync()!.id,
-                  );
-
-                  try {
-                    await habitsProvider.addHabitAsync(newHabit);
-                    setState(() {
-                      _localHabits
-                          .add(newHabit); // Immediately add to local state
-                    });
-                    Navigator.of(context).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('${newHabit.title} added'),
-                        duration: Duration(seconds: 1),
-                      ),
-                    );
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Error adding habit: $e'),
-                        duration: Duration(seconds: 1),
-                      ),
-                    );
-                  }
-                }
-              },
-            ),
-          ],
+            );
+          },
         );
       },
     );
-  }
-
-  void _showFilterDialog() {
-    HabitPriority? tempSelectedPriority = _selectedPriority;
-    bool tempFilterCompleted = _filterCompleted;
-    bool tempFilterOverdue = _filterOverdue;
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Filter Habits'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              DropdownButton<HabitPriority>(
-                value: tempSelectedPriority,
-                hint: Text('Select Priority'),
-                onChanged: (HabitPriority? newValue) {
-                  setState(() {
-                    tempSelectedPriority = newValue;
-                  });
-                },
-                items: HabitPriority.values.map((priority) {
-                  return DropdownMenuItem<HabitPriority>(
-                    value: priority,
-                    child: Text(priority.toString().split('.').last),
-                  );
-                }).toList(),
-              ),
-              CheckboxListTile(
-                title: Text('Completed'),
-                value: tempFilterCompleted,
-                onChanged: (bool? value) {
-                  setState(() {
-                    tempFilterCompleted = value ?? false;
-                  });
-                },
-              ),
-              CheckboxListTile(
-                title: Text('Overdue'),
-                value: tempFilterOverdue,
-                onChanged: (bool? value) {
-                  setState(() {
-                    tempFilterOverdue = value ?? false;
-                  });
-                },
-              ),
-            ],
-          ),
-          actions: [
-            ElevatedButton(
-              child: Text('Clear'),
-              onPressed: () {
-                setState(() {
-                  _selectedPriority = null;
-                  _filterCompleted = false;
-                  _filterOverdue = false;
-                });
-                Navigator.of(context).pop();
-              },
-            ),
-            ElevatedButton(
-              child: Text('Apply'),
-              onPressed: () {
-                setState(() {
-                  _selectedPriority = tempSelectedPriority;
-                  _filterCompleted = tempFilterCompleted;
-                  _filterOverdue = tempFilterOverdue;
-                });
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  List<TimeInvestmentHabitViewModel> _applyFilters() {
-    return _localHabits.where((habit) {
-      if (_selectedPriority != null && habit.priority != _selectedPriority) {
-        return false;
-      }
-      if (_filterCompleted && !habit.isCompleted()) {
-        return false;
-      }
-      return true;
-    }).toList();
   }
 
   Widget _buildTextField(TextEditingController controller, String labelText) {
@@ -246,27 +166,6 @@ class _HabitListViewState extends State<HabitListView> {
     );
   }
 
-  Widget _buildDatePickerField(String label, TextEditingController controller) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(labelText: label),
-      readOnly: true,
-      onTap: () async {
-        DateTime? pickedDate = await showDatePicker(
-          context: context,
-          initialDate: DateTime.now(),
-          firstDate: DateTime(2000),
-          lastDate: DateTime(2101),
-        );
-        if (pickedDate != null) {
-          setState(() {
-            controller.text = pickedDate.toLocal().toString().split(' ')[0];
-          });
-        }
-      },
-    );
-  }
-
   Future<void> _deleteHabit(int habitId, HabitsProvider habitsProvider) async {
     try {
       await habitsProvider.deleteHabitAsync(habitId);
@@ -290,22 +189,23 @@ class _HabitListViewState extends State<HabitListView> {
     }
   }
 
-  Widget _buildPriorityDropdown(HabitPriority priority) {
+  Widget _buildPriorityDropdown(HabitPriority currentPriority,
+      Function(HabitPriority) onPriorityChanged) {
     return Row(
       children: [
         Text('Priority'),
         SizedBox(width: 8.0),
         DropdownButton<HabitPriority>(
-          value: priority,
+          value: currentPriority, // Use the passed currentPriority from state
           onChanged: (HabitPriority? newValue) {
-            setState(() {
-              priority = newValue!;
-            });
+            if (newValue != null) {
+              onPriorityChanged(newValue); // Notify parent about the change
+            }
           },
-          items: HabitPriority.values.map((HabitPriority classType) {
+          items: HabitPriority.values.map((HabitPriority priority) {
             return DropdownMenuItem<HabitPriority>(
-              value: classType,
-              child: Text(classType.toString().split('.').last),
+              value: priority,
+              child: Text(priority.toString().split('.').last),
             );
           }).toList(),
         ),
@@ -313,7 +213,8 @@ class _HabitListViewState extends State<HabitListView> {
     );
   }
 
-  Widget _buildFrequencyDaysChips(List<FrequencyDay> selectedFrequencyDays) {
+  Widget _buildFrequencyDaysChips(
+      List<FrequencyDay> selectedFrequencyDays, StateSetter dialogSetState) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -322,25 +223,21 @@ class _HabitListViewState extends State<HabitListView> {
           child: Text('Frequency Days'),
         ),
         SizedBox(width: 8.0),
-        StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return Wrap(
-              spacing: 8.0,
-              children: FrequencyDay.values.map((day) {
-                return ChoiceChip(
-                  label: Text(day.toString().split('.').last.substring(0, 2)),
-                  selected: selectedFrequencyDays.contains(day),
-                  onSelected: (bool selected) {
-                    setState(() {
-                      selected
-                          ? selectedFrequencyDays.add(day)
-                          : selectedFrequencyDays.remove(day);
-                    });
-                  },
-                );
-              }).toList(),
+        Wrap(
+          spacing: 8.0,
+          children: FrequencyDay.values.map((day) {
+            return ChoiceChip(
+              label: Text(day.toString().split('.').last.substring(0, 2)),
+              selected: selectedFrequencyDays.contains(day),
+              onSelected: (bool selected) {
+                dialogSetState(() {
+                  selected
+                      ? selectedFrequencyDays.add(day)
+                      : selectedFrequencyDays.remove(day);
+                });
+              },
             );
-          },
+          }).toList(),
         ),
       ],
     );
@@ -350,15 +247,13 @@ class _HabitListViewState extends State<HabitListView> {
   Widget build(BuildContext context) {
     final habitsProvider = Provider.of<HabitsProvider>(context);
 
-    final filteredHabits = _applyFilters();
-
     return Scaffold(
-      body: filteredHabits.isEmpty
+      body: _localHabits.isEmpty
           ? Center(child: Text("No habits found"))
           : ListView.builder(
-              itemCount: filteredHabits.length,
+              itemCount: _localHabits.length,
               itemBuilder: (context, index) {
-                final habit = filteredHabits[index];
+                final habit = _localHabits[index];
                 return HabitView(
                   habit: habit,
                   onDelete: () => _deleteHabit(habit.id, habitsProvider),
