@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:habitlyy/viewmodels/habits/habit_viewmodel.dart';
-import '../../providers/habit_provider.dart';
 import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:habitlyy/viewmodels/habits/habit_viewmodel.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/habit_provider.dart';
 
 class DashboardListItemView extends StatefulWidget {
   final TimeInvestmentHabitViewModel habit;
