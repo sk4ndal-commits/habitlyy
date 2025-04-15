@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import '../../enums/frequency_days.dart';
 import '../../enums/habit_priority.dart';
 import '../../services/habits/ihabits_service.dart';
-import '../../services/profile/iuser_service.dart';
 import '../../viewmodels/habits/habit_viewmodel.dart';
 import 'habit_view.dart';
 
@@ -20,7 +19,6 @@ class HabitListView extends StatefulWidget {
 
 class _HabitListViewState extends State<HabitListView> {
   final habitsService = getIt<IHabitsService>();
-  final userService = getIt<IUserService>();
   List<TimeInvestmentHabitViewModel> _localHabits = [];
   final _formKey = GlobalKey<FormState>();
 
@@ -31,13 +29,10 @@ class _HabitListViewState extends State<HabitListView> {
   }
 
   void _fetchHabits() async {
-    final currentUser = await userService.getCurrentUserAsync();
-    if (currentUser != null) {
-      final habits = await habitsService.getHabitsByUserIdAsync(currentUser.id);
-      setState(() {
-        _localHabits = habits; // Store fetched habits in the local list
-      });
-    }
+    final habits = await habitsService.getHabitsAsync();
+    setState(() {
+      _localHabits = habits; // Store fetched habits in the local list
+    });
   }
 
   void _addHabit(HabitsProvider habitsProvider) {
@@ -104,7 +99,6 @@ class _HabitListViewState extends State<HabitListView> {
                         // Use the updated priority
                         targetHours: double.parse(targetHoursController.text),
                         frequencyDays: selectedFrequencyDays,
-                        userId: await userService.getCurrentUserAsync()!.id,
                       );
 
                       try {

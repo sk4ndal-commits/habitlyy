@@ -20,36 +20,7 @@ class DashboardListView extends StatelessWidget {
 
     // If all habits are completed, show a congratulatory card
     if (filteredHabits.isEmpty) {
-      return Center(
-        child: Card(
-          color: Colors.orange,
-          margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.check_circle, color: Colors.green, size: 48.0),
-                SizedBox(height: 8.0),
-                Text(
-                  'Congrats!',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                SizedBox(height: 8.0),
-                Text(
-                  'All tasks are completed for today.',
-                  style: TextStyle(fontSize: 16.0, color: Colors.black),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
+      return CongratsCard();
     }
 
     // Else, show the filtered habit list
@@ -66,6 +37,39 @@ class DashboardListView extends StatelessWidget {
           habit: habit,
         );
       },
+    );
+  }
+
+  Widget CongratsCard() {
+    return Center(
+      child: Card(
+        color: Colors.orange,
+        margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.check_circle, color: Colors.green, size: 48.0),
+              SizedBox(height: 8.0),
+              Text(
+                'Congrats!',
+                style: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              SizedBox(height: 8.0),
+              Text(
+                'All tasks are completed for today.',
+                style: TextStyle(fontSize: 16.0, color: Colors.black),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

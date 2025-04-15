@@ -1,14 +1,12 @@
 import 'package:habitlyy/enums/frequency_days.dart';
 import '../../repositories/habits/habits_repository.dart';
 import '../../viewmodels/habits/habit_viewmodel.dart';
-import '../profile/iuser_service.dart';
 import 'ihabits_service.dart';
 
 class HabitsService implements IHabitsService {
   final IHabitsRepository _repository;
-  final IUserService _userService;
 
-  HabitsService(this._repository, this._userService);
+  HabitsService(this._repository);
 
   @override
   Future<void> addHabitAsync(TimeInvestmentHabitViewModel habit) async {
@@ -32,15 +30,9 @@ class HabitsService implements IHabitsService {
 
   @override
   Future<List<TimeInvestmentHabitViewModel>> getTodayHabitsAsync() async {
-    final currentUser = _userService.getCurrentUserAsync();
-    if (currentUser == null) {
-      return [];
-    }
-
     final today = getFrequencyDay(DateTime.now().weekday);
-    final habitsByUser = await _repository.getHabitsByUserIdAsync(currentUser.id);
 
-    final habits = habitsByUser
+    final habits = (await this._repository.getHabitsAsync())
         .where((habit) => habit.frequencyDays?.contains(today) ?? false)
         .toList();
 

@@ -21,7 +21,6 @@ class HabitsDBRepository implements IHabitsRepository {
         'targetHours': habit.targetHours,
         'frequencyDays':
             habit.frequencyDays != null ? habit.frequencyDays.toString() : null,
-        'userId': habit.userId,
       },
     );
   }
@@ -37,7 +36,6 @@ class HabitsDBRepository implements IHabitsRepository {
         'frequencyDays': habit.frequencyDays != null
             ? habit.frequencyDays?.map((e) => e.toString()).join(",")
             : null,
-        'userId': habit.userId,
       },
       where: 'id = ?',
       whereArgs: [habit.id],
@@ -83,7 +81,6 @@ class HabitsDBRepository implements IHabitsRepository {
       frequencyDays: row['frequencyDays'] != null
           ? _parseFrequencyDays(row['frequencyDays'] as String)
           : null,
-      userId: row['userId'] as int,
     );
   }
 

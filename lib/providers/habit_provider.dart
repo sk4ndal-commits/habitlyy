@@ -44,7 +44,6 @@ class HabitsProvider with ChangeNotifier {
   }
 
   /// Update an existing habit
-  /// Update an existing habit
   Future<void> updateHabitAsync(
       TimeInvestmentHabitViewModel updatedHabit) async {
     // Update the habit in the service

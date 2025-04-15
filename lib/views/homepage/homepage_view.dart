@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../generated/l10n.dart';
 import '../dashboard/dashboard_view.dart';
 import '../habits/habits_list_view.dart';
-import '../profile/profile_view.dart';
 
 class HomePageView extends StatefulWidget {
   const HomePageView({super.key});
@@ -18,7 +17,6 @@ class _HomePageViewState extends State<HomePageView> {
   static final List<Widget> _widgetOptions = <Widget>[
     DashboardView(),
     HabitListView(),
-    ProfileView(),
   ];
 
   void _onTabSelected(int index) {
@@ -67,10 +65,6 @@ class _HomePageViewState extends State<HomePageView> {
         BottomNavigationBarItem(
           icon: Icon(Icons.track_changes),
           label: S.of(context)?.navbar_habits ?? '',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: S.of(context)?.navbar_profile ?? '',
         ),
       ],
       currentIndex: _selectedIndex,

@@ -15,13 +15,11 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
     required HabitPriority priority,
     required this.targetHours,
     required List<FrequencyDay>? frequencyDays,
-    required int userId,
   }) : super(
           id: id,
           title: title,
           priority: priority,
           frequencyDays: frequencyDays,
-          userId: userId,
         );
 
   /// Convert the object to JSON
@@ -34,7 +32,6 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
       'targetHours': targetHours,
       'frequencyDays': frequencyDays?.map((day) => day.toString()).toList(),
       // Assuming FrequencyDay is an enum or similar
-      'userId': userId,
     };
   }
 
@@ -51,7 +48,6 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
           ?.map((e) => FrequencyDay.values.firstWhere((f) => f.toString() == e))
           .toList(),
       // Parse frequencyDays enums
-      userId: json['userId'] as int,
     );
   }
 
@@ -67,7 +63,6 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
           ?.split(',')
           .map((e) => FrequencyDay.values[int.parse(e)])
           .toList(),
-      userId: map['userId'] as int,
     )
       ..investedHours = map['investedHours'] as double
       ..progressLog = (map['progressLog'] as String).isNotEmpty

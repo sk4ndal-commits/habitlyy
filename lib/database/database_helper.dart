@@ -29,17 +29,6 @@ class DatabaseHelper {
   }
 
   Future<void> _onCreate(Database db, int version) async {
-    // Create the users table
-    await db.execute('''
-      CREATE TABLE users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        email TEXT UNIQUE,
-        password TEXT,
-        photoUrl TEXT
-      )
-    ''');
-
     // Create the habits table
     await db.execute('''
       CREATE TABLE habits (
@@ -47,9 +36,7 @@ class DatabaseHelper {
         title TEXT,
         priority TEXT,
         targetHours REAL,
-        frequencyDays TEXT,
-        userId INTEGER,
-        FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE
+        frequencyDays TEXT
       )
     ''');
   }
