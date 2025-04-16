@@ -3,11 +3,11 @@ import 'package:habitlyy/enums/frequency_days.dart';
 
 import '../../enums/habit_priority.dart';
 
-class HabitViewModelBase {
+/// Base class for all habit view models
+abstract class HabitViewModelBase {
   int id;
   String title;
   HabitPriority priority;
-  late bool completed;
   late DateTime lastUpdated;
   List<FrequencyDay>? frequencyDays;
 
@@ -17,7 +17,6 @@ class HabitViewModelBase {
     required this.priority,
     required this.frequencyDays,
   }) {
-    completed = false;
     lastUpdated = DateTime.now();
   }
 
@@ -26,11 +25,11 @@ class HabitViewModelBase {
     return '$title - $priority';
   }
 
-  bool isCompleted() {
-    return completed;
-  }
+  /// Check if the habit is completed
+  /// This method should be implemented by derived classes
+  bool isCompleted();
 
-  void complete() {
-    completed = true;
-  }
+  /// Calculate the completion percentage
+  /// This method should be implemented by derived classes
+  double calculateCompletionPercentage();
 }

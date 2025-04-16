@@ -36,7 +36,10 @@ class DatabaseHelper {
         title TEXT,
         priority TEXT,
         targetHours REAL,
-        frequencyDays TEXT
+        investedHours REAL DEFAULT 0,
+        progressLog TEXT DEFAULT '',
+        frequencyDays TEXT,
+        lastUpdated TEXT
       )
     ''');
   }

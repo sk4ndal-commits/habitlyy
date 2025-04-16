@@ -28,53 +28,189 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
       'id': id,
       'title': title,
       'priority': priority.toString(),
-      // Assuming priority is an enum
       'targetHours': targetHours,
-      'frequencyDays': frequencyDays?.map((day) => day.toString()).toList(),
-      // Assuming FrequencyDay is an enum or similar
+      'investedHours': investedHours,
+      'progressLog': _serializeProgressLog(),
+      'frequencyDays': frequencyDays?.map((day) => day.index).toList(),
+      'lastUpdated': lastUpdated.toIso8601String(),
     };
+  }
+
+  /// Helper method to serialize progress log
+  String _serializeProgressLog() {
+    if (progressLog.isEmpty) return '';
+
+    return progressLog.map((log) {
+      final date = log['date'] is DateTime 
+          ? (log['date'] as DateTime).toIso8601String()
+          : log['date'].toString();
+      return '$date:${log['hours']}';
+    }).join('|');
   }
 
   /// Create an object from JSON
   factory TimeInvestmentHabitViewModel.fromJson(Map<String, dynamic> json) {
-    return TimeInvestmentHabitViewModel(
-      id: json['id'] as int,
-      title: json['title'] as String,
-      priority: HabitPriority.values
-          .firstWhere((e) => e.toString() == json['priority']),
-      // Assuming HabitPriority is an Enum
-      targetHours: (json['targetHours'] as num).toDouble(),
-      frequencyDays: (json['frequencyDays'] as List<dynamic>?)
-          ?.map((e) => FrequencyDay.values.firstWhere((f) => f.toString() == e))
-          .toList(),
-      // Parse frequencyDays enums
-    );
+    try {
+      final habit = TimeInvestmentHabitViewModel(
+        id: json['id'] as int,
+        title: json['title'] as String,
+        priority: HabitPriority.values
+            .firstWhere((e) => e.toString() == json['priority']),
+        targetHours: (json['targetHours'] as num).toDouble(),
+        frequencyDays: _parseFrequencyDays(json['frequencyDays']),
+      );
+
+      // Set additional properties if available
+      if (json.containsKey('investedHours')) {
+        habit.investedHours = (json['investedHours'] as num).toDouble();
+      }
+
+      // Parse progress log if available
+      if (json.containsKey('progressLog') && json['progressLog'] != null) {
+        habit.progressLog = _parseProgressLog(json['progressLog']);
+      }
+
+      // Set lastUpdated if available
+      if (json.containsKey('lastUpdated') && json['lastUpdated'] != null) {
+        try {
+          habit.lastUpdated = DateTime.parse(json['lastUpdated'] as String);
+        } catch (e) {
+          habit.lastUpdated = DateTime.now();
+        }
+      }
+
+      return habit;
+    } catch (e) {
+      print('Error parsing JSON to habit: $e');
+      throw Exception('Failed to parse JSON to habit: $e');
+    }
   }
 
+  /// Helper method to parse frequency days from JSON
+  static List<FrequencyDay>? _parseFrequencyDays(dynamic frequencyDays) {
+    if (frequencyDays == null) return null;
+
+    try {
+      if (frequencyDays is List<dynamic>) {
+        return frequencyDays.map((e) {
+          if (e is int) {
+            // Handle index-based format
+            return FrequencyDay.values[e];
+          } else {
+            // Handle string-based format
+            return FrequencyDay.values.firstWhere(
+              (f) => f.toString() == e.toString(),
+              orElse: () => FrequencyDay.MONDAY,
+            );
+          }
+        }).toList();
+      } else if (frequencyDays is String) {
+        // Handle comma-separated string format
+        return frequencyDays.split(',').map((day) {
+          final index = int.tryParse(day.trim());
+          if (index != null && index >= 0 && index < FrequencyDay.values.length) {
+            return FrequencyDay.values[index];
+          }
+          return FrequencyDay.values.firstWhere(
+            (f) => f.toString() == day.trim(),
+            orElse: () => FrequencyDay.MONDAY,
+          );
+        }).toList();
+      }
+    } catch (e) {
+      print('Error parsing frequency days: $e');
+    }
+
+    return [FrequencyDay.MONDAY];
+  }
+
+  /// Helper method to parse progress log from JSON
+  static List<Map<String, dynamic>> _parseProgressLog(dynamic progressLog) {
+    if (progressLog == null) return [];
+
+    try {
+      if (progressLog is String) {
+        if (progressLog.isEmpty) return [];
+
+        return progressLog.split('|').map((logEntry) {
+          final parts = logEntry.split(':');
+          if (parts.length != 2) return {'date': DateTime.now(), 'hours': 0.0};
+
+          DateTime date;
+          try {
+            date = DateTime.parse(parts[0]);
+          } catch (e) {
+            date = DateTime.now();
+          }
+
+          double hours;
+          try {
+            hours = double.parse(parts[1]);
+          } catch (e) {
+            hours = 0.0;
+          }
+
+          return {'date': date, 'hours': hours};
+        }).toList();
+      } else if (progressLog is List) {
+        return progressLog.map((log) {
+          if (log is Map<String, dynamic>) {
+            final date = log['date'] is String 
+                ? DateTime.parse(log['date'] as String)
+                : log['date'] as DateTime;
+            final hours = (log['hours'] as num).toDouble();
+            return {'date': date, 'hours': hours};
+          }
+          return {'date': DateTime.now(), 'hours': 0.0};
+        }).toList();
+      }
+    } catch (e) {
+      print('Error parsing progress log: $e');
+    }
+
+    return [];
+  }
+
+  /// Create an object from a database map
   factory TimeInvestmentHabitViewModel.fromMap(Map<String, dynamic> map) {
-    return TimeInvestmentHabitViewModel(
-      id: map['id'] as int,
-      title: map['title'] as String,
-      priority: HabitPriority.values.firstWhere(
-        (e) => e.toString() == map['priority'],
-      ),
-      targetHours: map['targetHours'] as double,
-      frequencyDays: (map['frequencyDays'] as String?)
-          ?.split(',')
-          .map((e) => FrequencyDay.values[int.parse(e)])
-          .toList(),
-    )
-      ..investedHours = map['investedHours'] as double
-      ..progressLog = (map['progressLog'] as String).isNotEmpty
-          ? List<Map<String, dynamic>>.from(
-              (map['progressLog'] as String).split('|').map((log) {
-              final logParts = log.split(':');
-              return {
-                "date": logParts[0],
-                "hours": double.parse(logParts[1]),
-              };
-            }))
-          : [];
+    try {
+      final habit = TimeInvestmentHabitViewModel(
+        id: map['id'] as int,
+        title: map['title'] as String,
+        priority: HabitPriority.values.firstWhere(
+          (e) => e.toString() == map['priority'],
+          orElse: () => HabitPriority.LOW,
+        ),
+        targetHours: (map['targetHours'] as num).toDouble(),
+        frequencyDays: map['frequencyDays'] != null
+            ? _parseFrequencyDays(map['frequencyDays'])
+            : null,
+      );
+
+      // Set investedHours if available
+      if (map.containsKey('investedHours') && map['investedHours'] != null) {
+        habit.investedHours = (map['investedHours'] as num).toDouble();
+      }
+
+      // Parse progress log if available
+      if (map.containsKey('progressLog') && map['progressLog'] != null) {
+        habit.progressLog = _parseProgressLog(map['progressLog']);
+      }
+
+      // Set lastUpdated if available
+      if (map.containsKey('lastUpdated') && map['lastUpdated'] != null) {
+        try {
+          habit.lastUpdated = DateTime.parse(map['lastUpdated'] as String);
+        } catch (e) {
+          habit.lastUpdated = DateTime.now();
+        }
+      }
+
+      return habit;
+    } catch (e) {
+      print('Error mapping database row to habit: $e');
+      throw Exception('Failed to map database row to habit: $e');
+    }
   }
 
   void logTime(DateTime date, double hours) {
