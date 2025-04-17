@@ -91,37 +91,57 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
     if (frequencyDays == null) return null;
 
     try {
+      // Handle List format (most common case)
       if (frequencyDays is List<dynamic>) {
-        return frequencyDays.map((e) {
-          if (e is int) {
-            // Handle index-based format
-            return FrequencyDay.values[e];
-          } else {
-            // Handle string-based format
-            return FrequencyDay.values.firstWhere(
-              (f) => f.toString() == e.toString(),
-              orElse: () => FrequencyDay.MONDAY,
-            );
-          }
-        }).toList();
-      } else if (frequencyDays is String) {
-        // Handle comma-separated string format
-        return frequencyDays.split(',').map((day) {
-          final index = int.tryParse(day.trim());
-          if (index != null && index >= 0 && index < FrequencyDay.values.length) {
-            return FrequencyDay.values[index];
-          }
-          return FrequencyDay.values.firstWhere(
-            (f) => f.toString() == day.trim(),
-            orElse: () => FrequencyDay.MONDAY,
-          );
-        }).toList();
+        return _parseFrequencyDaysList(frequencyDays);
+      } 
+      // Handle String format (comma-separated)
+      else if (frequencyDays is String) {
+        return _parseFrequencyDaysString(frequencyDays);
       }
     } catch (e) {
       print('Error parsing frequency days: $e');
     }
 
+    // Default to Monday if parsing fails
     return [FrequencyDay.MONDAY];
+  }
+
+  /// Parse frequency days from a list
+  static List<FrequencyDay> _parseFrequencyDaysList(List<dynamic> daysList) {
+    return daysList.map((e) {
+      if (e is int && e >= 0 && e < FrequencyDay.values.length) {
+        return FrequencyDay.values[e];
+      } else {
+        final String dayStr = e.toString();
+        for (final day in FrequencyDay.values) {
+          if (day.toString() == dayStr) {
+            return day;
+          }
+        }
+        return FrequencyDay.MONDAY; // Default
+      }
+    }).toList();
+  }
+
+  /// Parse frequency days from a comma-separated string
+  static List<FrequencyDay> _parseFrequencyDaysString(String daysString) {
+    return daysString.split(',').map((day) {
+      final trimmed = day.trim();
+      final index = int.tryParse(trimmed);
+
+      if (index != null && index >= 0 && index < FrequencyDay.values.length) {
+        return FrequencyDay.values[index];
+      }
+
+      for (final freqDay in FrequencyDay.values) {
+        if (freqDay.toString() == trimmed) {
+          return freqDay;
+        }
+      }
+
+      return FrequencyDay.MONDAY; // Default
+    }).toList();
   }
 
   /// Helper method to parse progress log from JSON
@@ -129,46 +149,60 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
     if (progressLog == null) return [];
 
     try {
+      // Handle String format (pipe-separated entries)
       if (progressLog is String) {
-        if (progressLog.isEmpty) return [];
-
-        return progressLog.split('|').map((logEntry) {
-          final parts = logEntry.split(':');
-          if (parts.length != 2) return {'date': DateTime.now(), 'hours': 0.0};
-
-          DateTime date;
-          try {
-            date = DateTime.parse(parts[0]);
-          } catch (e) {
-            date = DateTime.now();
-          }
-
-          double hours;
-          try {
-            hours = double.parse(parts[1]);
-          } catch (e) {
-            hours = 0.0;
-          }
-
-          return {'date': date, 'hours': hours};
-        }).toList();
-      } else if (progressLog is List) {
-        return progressLog.map((log) {
-          if (log is Map<String, dynamic>) {
-            final date = log['date'] is String 
-                ? DateTime.parse(log['date'] as String)
-                : log['date'] as DateTime;
-            final hours = (log['hours'] as num).toDouble();
-            return {'date': date, 'hours': hours};
-          }
-          return {'date': DateTime.now(), 'hours': 0.0};
-        }).toList();
+        return _parseProgressLogString(progressLog);
+      } 
+      // Handle List format
+      else if (progressLog is List) {
+        return _parseProgressLogList(progressLog);
       }
     } catch (e) {
       print('Error parsing progress log: $e');
     }
 
     return [];
+  }
+
+  /// Parse progress log from a pipe-separated string
+  static List<Map<String, dynamic>> _parseProgressLogString(String logString) {
+    if (logString.isEmpty) return [];
+
+    return logString.split('|').map((logEntry) {
+      final parts = logEntry.split(':');
+      if (parts.length != 2) return _createDefaultLogEntry();
+
+      try {
+        final date = DateTime.parse(parts[0]);
+        final hours = double.parse(parts[1]);
+        return {'date': date, 'hours': hours};
+      } catch (e) {
+        return _createDefaultLogEntry();
+      }
+    }).toList();
+  }
+
+  /// Parse progress log from a list
+  static List<Map<String, dynamic>> _parseProgressLogList(List<dynamic> logList) {
+    return logList.map((log) {
+      if (log is Map<String, dynamic>) {
+        try {
+          final date = log['date'] is String 
+              ? DateTime.parse(log['date'] as String)
+              : log['date'] as DateTime;
+          final hours = (log['hours'] as num).toDouble();
+          return {'date': date, 'hours': hours};
+        } catch (e) {
+          return _createDefaultLogEntry();
+        }
+      }
+      return _createDefaultLogEntry();
+    }).toList();
+  }
+
+  /// Create a default log entry with current date and zero hours
+  static Map<String, dynamic> _createDefaultLogEntry() {
+    return {'date': DateTime.now(), 'hours': 0.0};
   }
 
   /// Create an object from a database map
@@ -213,6 +247,7 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
     }
   }
 
+  /// Log time spent on the habit
   void logTime(DateTime date, double hours) {
     // Log time and update total invested hours
     progressLog.add({'date': date, 'hours': hours});
@@ -220,10 +255,8 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
     lastUpdated = DateTime.now();
   }
 
-  double hoursCompleted() {
-    return investedHours;
-  }
-
+  /// Check if the habit is completed (invested hours >= target hours)
+  @override
   bool isCompleted() {
     return investedHours >= targetHours;
   }
@@ -282,26 +315,33 @@ class TimeInvestmentHabitViewModel extends HabitViewModelBase {
     return weeklyProgress;
   }
 
+  /// Calculate the percentage of target hours completed
+  @override
   double calculateCompletionPercentage() {
-    // Calculate the percentage of target hours completed
     return (investedHours / targetHours * 100).clamp(0, 100);
   }
 }
 
 extension DateTimeExtension on DateTime {
   int weekOfYear() {
-    // ISO 8601 week number calculation
-    final beginningOfYear = DateTime(year, 1, 1);
-    final firstThursday =
-        beginningOfYear.add(Duration(days: (4 - beginningOfYear.weekday) % 7));
-    final startOfWeekOne =
-        firstThursday.subtract(Duration(days: firstThursday.weekday - 1));
+    // More efficient ISO 8601 week number calculation
+    // January 4th is always in week 1 according to ISO 8601
+    final jan4 = DateTime(year, 1, 4);
+    final jan4Weekday = jan4.weekday;
 
-    // Calculate the difference between the date and the start of Week 1
-    final difference = this.difference(startOfWeekOne).inDays;
+    // Find the first Monday of week 1
+    final firstMonday = jan4.subtract(Duration(days: jan4Weekday - 1));
+
+    // Calculate days since the first Monday of the year
+    final daysSinceFirstMonday = difference(firstMonday).inDays;
 
     // Calculate the week number
-    int weekNumber = (difference / 7).ceil() + 1;
-    return weekNumber > 0 ? weekNumber : 1;
+    if (daysSinceFirstMonday < 0) {
+      // Date is before the first week of this year, get week of previous year
+      final dec31LastYear = DateTime(year - 1, 12, 31);
+      return dec31LastYear.weekOfYear();
+    }
+
+    return (daysSinceFirstMonday / 7).floor() + 1;
   }
 }

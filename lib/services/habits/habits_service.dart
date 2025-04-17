@@ -73,21 +73,23 @@ class HabitsService implements IHabitsService {
     return await _repository.getHabitsByUserIdAsync(userId);
   }
 
+  // Constant array of frequency days for efficient lookup
+  static const List<FrequencyDay> _DAYS = [
+    FrequencyDay.MONDAY,
+    FrequencyDay.TUESDAY,
+    FrequencyDay.WEDNESDAY,
+    FrequencyDay.THURSDAY,
+    FrequencyDay.FRIDAY,
+    FrequencyDay.SATURDAY,
+    FrequencyDay.SUNDAY
+  ];
+
   /// Converts a weekday number to a FrequencyDay enum
   ///
   /// Takes a weekday number (1-7, where 1 is Monday) and returns the corresponding
   /// [FrequencyDay] enum value.
   FrequencyDay getFrequencyDay(int weekday) {
-    const days = [
-      FrequencyDay.MONDAY,
-      FrequencyDay.TUESDAY,
-      FrequencyDay.WEDNESDAY,
-      FrequencyDay.THURSDAY,
-      FrequencyDay.FRIDAY,
-      FrequencyDay.SATURDAY,
-      FrequencyDay.SUNDAY
-    ];
-    return days[(weekday - 1) % 7];
+    return _DAYS[(weekday - 1) % 7];
   }
 
 }

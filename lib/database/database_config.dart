@@ -1,3 +1,3 @@
 class DatabaseConfig {
-  String get DBName => "habitlyy.db";
+  String get DBName => "habitapp.db";
 }

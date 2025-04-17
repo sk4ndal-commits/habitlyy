@@ -39,7 +39,13 @@ class _HabitsAppState extends State<HabitsApp> with WidgetsBindingObserver {
     try {
       return MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (_) => HabitsProvider(habitsService)),
+          ChangeNotifierProvider(
+            create: (_) {
+              final habitsProvider = HabitsProvider(habitsService);
+              habitsProvider.initializeHabitsAsync(); // Initialize habits here
+              return habitsProvider;
+            },
+          ),
         ],
         child: MaterialApp(
           themeMode: ThemeMode.system,
@@ -64,7 +70,7 @@ class _HabitsAppState extends State<HabitsApp> with WidgetsBindingObserver {
         home: Scaffold(
           body: Center(
             child:
-                Text('An unexpected error occurred. Please restart the app.'),
+            Text('An unexpected error occurred. Please restart the app.'),
           ),
         ),
       );

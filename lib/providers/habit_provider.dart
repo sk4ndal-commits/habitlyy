@@ -12,6 +12,7 @@ import '../viewmodels/habits/habit_viewmodel.dart';
 /// for efficient state management
 class HabitsProvider with ChangeNotifier {
   final IHabitsService _habitsService; // Service is injected into the provider
+  SharedPreferences? _prefs; // Cached SharedPreferences instance
 
   // In-memory state for today's habits
   List<TimeInvestmentHabitViewModel> _todayHabits = [];
@@ -23,62 +24,42 @@ class HabitsProvider with ChangeNotifier {
 
   /// Retrieve filtered and sorted habits (with invested hours < target hours)
   List<TimeInvestmentHabitViewModel> get filteredAndSortedHabits {
-    final filteredHabits = _todayHabits
+    return _todayHabits
         .where((habit) => habit.investedHours < habit.targetHours)
-        .toList();
-
-    filteredHabits.sort((a, b) => b.priority.index.compareTo(a.priority.index));
-
-    return filteredHabits;
+        .toList()
+      ..sort(_priorityComparator);
   }
 
   /// Add a new habit
   Future<void> addHabitAsync(TimeInvestmentHabitViewModel habit) async {
-    await _habitsService.addHabitAsync(habit); // Save habit via service
-    _todayHabits.add(habit); // Add habit to the in-memory list
+    // Save habit via service
+    await _habitsService.addHabitAsync(habit);
+
+    // Update today's habits dynamically
+    await _refreshTodayHabits();
+
     notifyListeners(); // Notify listeners about the addition
   }
 
+  /// Comparator function for sorting habits by priority (HIGH to LOW)
+  int _priorityComparator(TimeInvestmentHabitViewModel a, TimeInvestmentHabitViewModel b) {
+    return b.priority.index.compareTo(a.priority.index);
+  }
+
+  /// Sort habits by priority
   void _sortHabits() {
-    _todayHabits.sort((a, b) => a.priority.index.compareTo(b.priority.index));
+    _todayHabits.sort(_priorityComparator);
   }
 
   /// Update an existing habit
-  Future<void> updateHabitAsync(
-      TimeInvestmentHabitViewModel updatedHabit) async {
+  Future<void> updateHabitAsync(TimeInvestmentHabitViewModel updatedHabit) async {
     // Update the habit in the service
     await _habitsService.updateHabitAsync(updatedHabit);
 
-    // Find the index of the habit in today's habits
-    final index = _todayHabits.indexWhere((h) => h.id == updatedHabit.id);
+    // Re-fetch all habits due today
+    await _refreshTodayHabits();
 
-    if (index != -1) {
-      _todayHabits[index] = updatedHabit;
-    }
-
-    // Check if the updated habit's frequency includes today
-    final isDueToday = _isHabitDueToday(updatedHabit);
-
-    if (isDueToday) {
-      // Add to today's habits if not already included
-      if (index == -1) {
-        _todayHabits.add(updatedHabit);
-      } else {
-        // Habit is already in today's list, just update it
-        _todayHabits[index] = updatedHabit;
-      }
-    } else {
-      // The habit is no longer due today, remove it from _todayHabits if it exists
-      if (index != -1) {
-        _todayHabits.removeAt(index);
-      }
-    }
-
-    // Sort the habits after updates
-    _sortHabits();
-
-    // Notify listeners about the changes
-    notifyListeners();
+    notifyListeners(); // Notify listeners about the changes
   }
 
   /// Initialize habits and handle resetting invested hours for a new day
@@ -86,11 +67,8 @@ class HabitsProvider with ChangeNotifier {
     // Reset invested hours if it's a new day
     await _resetInvestedHoursIfNewDay();
 
-    // Fetch today's habits from the backend for the logged-in user
-    _todayHabits = await _habitsService.getTodayHabitsAsync();
-
-    // Sync `investedHours` values from local storage
-    await _syncInvestedHoursFromLocalStorage();
+    // Fetch today's habits and update state
+    await _refreshTodayHabits();
 
     notifyListeners(); // Notify widgets of the updated state
   }
@@ -108,9 +86,15 @@ class HabitsProvider with ChangeNotifier {
     await _saveHabitsToLocalStorage();
   }
 
+  /// Get the SharedPreferences instance (cached for performance)
+  Future<SharedPreferences> _getPrefs() async {
+    _prefs ??= await SharedPreferences.getInstance();
+    return _prefs!;
+  }
+
   /// Save today's habits to local storage
   Future<void> _saveHabitsToLocalStorage() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await _getPrefs();
 
     // Serialize habits into a JSON string
     final habitListJson = jsonEncode(
@@ -123,36 +107,40 @@ class HabitsProvider with ChangeNotifier {
 
   /// Synchronize saved `investedHours` from local storage to in-memory habits
   Future<void> _syncInvestedHoursFromLocalStorage() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await _getPrefs();
 
     // Retrieve the JSON string of saved habits
     final habitListJson = prefs.getString('todayHabits');
     if (habitListJson == null) return; // No data to sync
 
-    // Parse the saved habits JSON as a list
-    final List<dynamic> savedHabitsJson = jsonDecode(habitListJson);
+    try {
+      // Parse the saved habits JSON as a list
+      final List<dynamic> savedHabitsJson = jsonDecode(habitListJson);
 
-    // Update `investedHours` for matching habits in `_todayHabits`
-    for (final savedHabitJson in savedHabitsJson) {
-      final habitFromStorage =
-          TimeInvestmentHabitViewModel.fromJson(savedHabitJson);
+      // Create a map for faster lookups by ID
+      final Map<int, TimeInvestmentHabitViewModel> habitMap = {
+        for (var habit in _todayHabits) habit.id: habit
+      };
 
-      try {
-        // Find the corresponding habit by ID in `_todayHabits`
-        final matchingHabit =
-            _todayHabits.firstWhere((h) => h.id == habitFromStorage.id);
+      // Update `investedHours` for matching habits
+      for (final savedHabitJson in savedHabitsJson) {
+        final habitFromStorage =
+        TimeInvestmentHabitViewModel.fromJson(savedHabitJson);
 
-        // Sync the `investedHours` value from storage
-        matchingHabit.investedHours = habitFromStorage.investedHours;
-      } catch (e) {
-        // Ignore if no matching habit is found
+        final matchingHabit = habitMap[habitFromStorage.id];
+        if (matchingHabit != null) {
+          matchingHabit.investedHours = habitFromStorage.investedHours;
+        }
       }
+    } catch (e) {
+      // Handle JSON parsing errors gracefully
+      print('Error syncing habits from local storage: $e');
     }
   }
 
   /// Reset `investedHours` to zero for all habits if it's a new day
   Future<void> _resetInvestedHoursIfNewDay() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await _getPrefs();
 
     // Get the last recorded reset date
     final lastResetDate = prefs.getString('lastResetDate') ?? '';
@@ -179,22 +167,49 @@ class HabitsProvider with ChangeNotifier {
     return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
   }
 
+  // Cache for today's date and day
+  DateTime? _today;
+  FrequencyDay? _todayDay;
+
   /// Helper function to check if a habit is due today
   bool _isHabitDueToday(TimeInvestmentHabitViewModel habit) {
-    // Get today's day as a FrequencyDay (assuming FrequencyDay is an enum or similar)
-    final today = DateTime.now();
-    final todayDay = FrequencyDay.values[today.weekday - 1];
+    // Get today's date and cache it for the day
+    final now = DateTime.now();
+
+    // Only recalculate if the date has changed
+    if (_today == null ||
+        _today!.year != now.year ||
+        _today!.month != now.month ||
+        _today!.day != now.day) {
+      _today = now;
+      _todayDay = FrequencyDay.values[now.weekday - 1];
+    }
 
     // Check if the habit's frequency includes today
-    return habit.frequencyDays?.contains(todayDay) ?? false;
+    return habit.frequencyDays?.contains(_todayDay) ?? false;
+  }
+
+  /// Refresh habits list to only include those due today
+  Future<void> _refreshTodayHabits() async {
+    // Fetch all habits from the service
+    final allHabits = await _habitsService.getHabitsAsync();
+
+    // Filter habits due today
+    _todayHabits = allHabits.where(_isHabitDueToday).toList();
+
+    // Sync invested hours from local storage
+    await _syncInvestedHoursFromLocalStorage();
+
+    // Sort habits by priority
+    _sortHabits();
   }
 
   /// Delete a habit by its ID
   Future<void> deleteHabitAsync(int habitId) async {
     await _habitsService.deleteHabitAsync(habitId); // Remove habit via service
-    _todayHabits.removeWhere((habit) => habit.id == habitId); // Update state
 
-    await _saveHabitsToLocalStorage();
+    // Update today's habits
+    await _refreshTodayHabits();
 
     notifyListeners(); // Notify listeners about the deletion
   }
