@@ -1,17 +1,28 @@
-# habitlyy_new
+# ***habitlyy***
 
-A new Flutter project.
+***habitlyy*** is a minimalistic Android app designed to help users set, manage, and
+achieve their personal habits. The app focuses on simplicity and motivation,
+making it easy to stay consistent and track progress over time.
 
-## Getting Started
+Features:
 
-This project is a starting point for a Flutter application.
+    Create Habits:
+    Add habits with time-based targets to track your progress effectively.
 
-A few resources to get you started if this is your first Flutter project:
+    Progress Dashboard:
+        Visualize your achievements with an intuitive graph showing completed habits and overall progress.
+        View a detailed list of active habits, with percentage completion and progress bars.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+    Habit Management:
+        Time-based habits: Log hours spent and compare them to your target.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# habitlyy
+    User Account:
+        Manage basic profile information.
+        Log out or customize app settings (e.g., reminders).
+
+Minimal Design:
+
+    Inspired by stock portfolio apps, habitlyy uses a clean and modern interface
+    to keep your habits at the center of attention.
+
+    Stay focused, track progress, and accomplish more with habitlyy!
