@@ -1,0 +1,8 @@
+{
+  "@@locale": "en",
+  "title": "habitly",
+  "welcome": "Welcome to habitly",
+  "navbar_home": "Home",
+  "navbar_habits": "Habits",
+  "navbar_profile": "Profile"
+}
