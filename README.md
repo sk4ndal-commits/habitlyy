@@ -26,3 +26,35 @@ Minimal Design:
     to keep your habits at the center of attention.
 
     Stay focused, track progress, and accomplish more with habitlyy!
+
+## Login
+
+![Login](./images/login.png)
+
+## Home
+
+![Home](./images/home.png)
+
+## Update Times
+
+![Update Tasks](./images/update_hours.png)
+
+## Goals
+
+![Goals](./images/goals.png)
+
+## Adding Habits
+
+![Add Goals](./images/add_goals.png)
+
+## Editing Habits
+
+![Edit Goals](./images/update.png)
+
+## Delete Habits
+
+![Delete](./images/delete.png)
+
+## Profile
+
+![Profile](./images/profile.png)
