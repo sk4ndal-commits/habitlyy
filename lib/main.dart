@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:habitlyy/providers/habit_provider.dart';
@@ -10,9 +11,16 @@ import 'package:habitlyy/views/showcase/app_showcase_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:habitlyy/service_locator.dart';
 import 'generated/l10n.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
+  
   await setupLocator();
   runApp(HabitsApp());
 }
