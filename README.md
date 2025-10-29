@@ -39,6 +39,15 @@ Minimal Design:
 - Persistent simple settings — `shared_preferences`: stores small key/value data such as simple preferences or lightweight cached values.
 - Code generation & testing — `build_runner`, `flutter_gen`: used for code-generation tasks (intl, assets, etc.); `mockito` for unit test mocks.
 
+## Architecture
+
+- Views / UI: Flutter widgets that render screens and visuals. Look under `lib/views/` (e.g. `views/homepage`, `views/profile`, `views/login`).
+- ViewModels / Providers: Lightweight state holders and controllers (ChangeNotifiers) used by the UI. See `lib/providers/` (for example `providers/habit_provider.dart`).
+- Services: Business-logic services that coordinate operations and higher-level workflows (e.g. `lib/services/habits`, `lib/services/profile`).
+- Repositories: Data access layer abstracting persistence (SQLite) and mapping DB rows to domain objects. Implementations live in `lib/repositories/` (e.g. `repositories/habits/habits_db_repository.dart`).
+- Database / Persistence: Local SQLite storage via `DatabaseHelper` in `lib/database/` (`database_helper.dart` and `database_config.dart`). The DB schema is created in `DatabaseHelper._onCreate`.
+- Service locator / DI: `get_it` is used to wire services, repositories and the shared `DatabaseHelper` in `lib/service_locator.dart`.
+
 ## Login
 
 ![Login](./images/login.png)
